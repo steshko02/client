@@ -8,7 +8,7 @@ import Login from "./components/login.component";
 import Register from "./components/register.component";
 import Home from "./components/home.component";
 import BoardUser from "./components/board-user.component";
-import BoardModerator from "./components/board-moderator.component";
+import BoardMentors from "./components/board-mentors.component";
 import BoardAdmin from "./components/board-admin.component";
 import Cards from "./courses/Card";
 import { useNavigate } from "react-router-dom";
@@ -83,7 +83,7 @@ class App extends Component {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/user" element={<BoardUser />} />
-            <Route path="/mod" element={<BoardModerator />} />
+            <Route path="/mentors" element={<BoardMentors />} />
             <Route path="/admin" element={<BoardAdmin />} />
             <Route path="/courses" element={<Cards />} />
             <Route path="/course-info" element={<CourseInfo />} />
