@@ -39,7 +39,9 @@ function LessonInfo() {
       ).then((response) => {
         console.log(response.data);
         setdata(response.data);
+        if(response.data.work){
         setaddWork(response.data.work.id);
+        }
             });
     },
 [addWork]);
@@ -147,11 +149,11 @@ const handleUpdate = (obj) => {
               { data.work && (
                 <MDBCardBody className="p-0">
                 <MDBRow>
-                    <MDBCol sm="9">
-                      <h5>{data.work.title}</h5>
+                    <MDBCol sm="9" className="mb-4">
+                      <h5>Задание - {data.work.title}</h5>
                     </MDBCol>
                   </MDBRow>
-                  <MDBRow>
+                  <MDBRow className="mb-4">
                     <MDBCol sm="5">
                       <MDBCardText>Дедлайн</MDBCardText>
                     </MDBCol>
@@ -160,58 +162,77 @@ const handleUpdate = (obj) => {
                     </MDBCol>
                   </MDBRow>
                   <MDBRow>
-                    <MDBCol sm="5">
-                      <MDBCardText>Описание</MDBCardText>
+                  <MDBCol sm="10">
+                      <MDBCardText>Описание:</MDBCardText>
+                  </MDBCol>
+                    <MDBCol>
+                      <MDBCardText className="text-muted mb-4">
+                        <WithLinks text ={data.work.description}></WithLinks>                      
+                        </MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="7">
-                      <MDBCardText className="text-muted">{data.work.description}</MDBCardText>
-                    </MDBCol>
-                    <hr/>
-                    <>
-                    <MDBCol sm="9">
+                
+                  </MDBRow>
+                  <MDBRow>
+                  <MDBCol sm="9">
+                      <MDBCardText>Прикрепленные файлы:</MDBCardText>
+                  </MDBCol>
+                  <>
+                    <MDBCol sm="9" >
                     {data.work.resource?.map((items, index) => {
-                      return (<a href={items.url}><img src="http://s1.iconbird.com/ico/2013/2/634/w42h50139292027210.png"/><br/> Файл - {index + 1} </a>)
+                      return (<a href={items.url}>
+                        {/* <img src="http://s1.iconbird.com/ico/2013/2/634/w42h50139292027210.png"/> */}
+                        {items.filename}</a>)
                     })}
                     </MDBCol>
                     </>
                   </MDBRow>
                 </MDBCardBody>
                 )}
-
+    <hr></hr>
               { data.answer && (
                 <MDBCardBody className="p-0">
                 <MDBRow>
-                    <MDBCol sm="9">
+                    <MDBCol sm="9" className="mb-4">
                       <h5>Ответ</h5>
                     </MDBCol>
                   </MDBRow>
                   <MDBRow>
-                    <MDBCol sm="5">
-                      <MDBCardText>Время сдачи</MDBCardText>
+                    <MDBCol sm="5" className="mb-4">
+                      <MDBCardText>Время сдачи:</MDBCardText>
                     </MDBCol>
                     <MDBCol sm="7">
                       <MDBCardText className="text-muted">{Helper.dateByFormat(data.answer.dateCreation)}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
+                  <MDBRow className="mb-4">
+                    <MDBCol sm="10" >
+                      <MDBCardText>Комментарий:</MDBCardText>
+                    </MDBCol>
+                    <MDBCol>
+                      <MDBCardText className="text-muted">
+                        <WithLinks text ={ data.answer.comment}></WithLinks>                      
+                        </MDBCardText>
+                      
+                    </MDBCol>
+                  </MDBRow>
+
                   <MDBRow>
-                    <MDBCol sm="5">
-                      <MDBCardText>Комментарий</MDBCardText>
-                    </MDBCol>
-                    <MDBCol sm="7">
-                      <MDBCardText className="text-muted">{data.answer.comment}</MDBCardText>
-                    </MDBCol>
-                    <hr/>
-                    <>
-                    <MDBCol sm="9">
+                  <MDBCol sm="9">
+                      <MDBCardText>Прикрепленные файлы:</MDBCardText>
+                  </MDBCol>
+                  <>
+                    <MDBCol sm="9" >
                     {data.answer.resource?.map((items, index) => {
-                      return (<a href={items.url}><img src="http://s1.iconbird.com/ico/2013/2/634/w42h50139292027210.png"/><br/> Файл - {index+1} </a>)
+                      return (<a href={items.url}>
+                        {/* <img src="http://s1.iconbird.com/ico/2013/2/634/w42h50139292027210.png"/> */}
+                        {items.filename}</a>)
                     })}
                     </MDBCol>
                     </>
                   </MDBRow>
                 </MDBCardBody>
                 )}
-                { data.work && 
+                { data.work && !data.answer && 
                 // data.studentId && 
                 (
               <button onClick={() => setShowAnswerModal(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
@@ -499,4 +520,16 @@ function WorkForm({handleUpdate}){
             </div>
         </Page>
   );
+}
+
+
+function WithLinks({text}) {
+
+    var res = []
+    
+    text && text.replace(/((?:https?:\/\/|ftps?:\/\/|\bwww\.)(?:(?![.,?!;:()]*(?:\s|$))[^\s]){2,})|(\n+|(?:(?!(?:https?:\/\/|ftp:\/\/|\bwww\.)(?:(?![.,?!;:()]*(?:\s|$))[^\s]){2,}).)+)/gim, (m, link, text) => {
+      res.push(link ? <a href={(link[0]==="w" ? "//" : "") + link} key={res.length}>{link}</a> : text)
+    })
+
+    return <div className="user-text">{res}</div>
 }
