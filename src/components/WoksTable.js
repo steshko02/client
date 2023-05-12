@@ -25,7 +25,7 @@ import Form from "react-validation/build/form";
 
 const API_URL = "http://localhost:8080/";
 
-let PageSize = 4;
+let PageSize = 2;
 export default function WorksTable({lessonId}) {
 
     const token = AuthService.getCurrentJwt()
@@ -60,32 +60,45 @@ export default function WorksTable({lessonId}) {
         ).then((response) => {
           console.log(response.data);
           setdata(response.data);
+          setPagination({
+            currentPage: response.data.currentPage,
+            totalPages: response.data.totalPages,
+            totalCount: response.data.totalCount
+          });
           setaddLesson(response.data.answers.length);
         });
       },
-  [addLesson]);
+  [pagination.currentPage, addLesson]);
 
     return (
-      <TableContainer component={Paper}>
-        <Table aria-label="collapsible table">
-          <TableHead>
-            <TableRow>
-            <TableCell />
-              <TableCell><span>Ученик</span></TableCell>
-              <TableCell>Статус</TableCell>
-              <TableCell>Задание</TableCell>
-              <TableCell>Время сдачи</TableCell>
-              <TableCell>Отметка</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.answers?.map((row) => (
-              <AnswerRow rowData={row} handleUpdate = {handleUpdate} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <><TableContainer component={Paper}>
+            <Table aria-label="collapsible table">
+                <TableHead>
+                    <TableRow>
+                        <TableCell />
+                        <TableCell><span>Ученик</span></TableCell>
+                        <TableCell>Статус</TableCell>
+                        <TableCell>Задание</TableCell>
+                        <TableCell>Время сдачи</TableCell>
+                        <TableCell>Отметка</TableCell>
+                        <TableCell></TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {data.answers?.map((row) => (
+                        <AnswerRow rowData={row} handleUpdate={handleUpdate} />
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer><Pagination
+                className="pagination-bar fixed"
+                currentPage={pagination.currentPage}
+                totalCount={pagination?.totalCount}
+                pageSize={PageSize}
+                onPageChange={page => setPagination({
+                    ...pagination,
+                    currentPage: page
+                })} /></>
     );
   }
 
@@ -169,7 +182,7 @@ export default function WorksTable({lessonId}) {
                 <Typography variant="h6" gutterBottom component="div">
                   Работа
                 </Typography>
-                    <p>{rowData.comment}</p>
+                <p><WithLinks text ={rowData.comment}></WithLinks></p>              
                     {rowData.resource?.map((items) => {
                       return (<a href={items.url}>
                         {items.filename}</a>)
@@ -202,4 +215,13 @@ export default function WorksTable({lessonId}) {
       </React.Fragment>
     );
   }
+  function WithLinks({text}) {
+
+    var res = []
+    
+    text && text.replace(/((?:https?:\/\/|ftps?:\/\/|\bwww\.)(?:(?![.,?!;:()]*(?:\s|$))[^\s]){2,})|(\n+|(?:(?!(?:https?:\/\/|ftp:\/\/|\bwww\.)(?:(?![.,?!;:()]*(?:\s|$))[^\s]){2,}).)+)/gim, (m, link, text) => {
+      res.push(link ? <a href={(link[0]==="w" ? "//" : "") + link} key={res.length}>{link}</a> : text)
+    })
   
+    return <div className="user-text">{res}</div>
+  }

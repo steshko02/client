@@ -402,17 +402,9 @@ const handleUpdate = (obj) => {
     }
   }
 
-  const bookCourseHandler = (id) => {
-  
-    const response = axios.post("http://localhost:8080/bookings/"+id,config).then(
-    ).then((response) => {
-      setBook(true);
-  }
-  ).catch(setBook(false));
-    };
-
   const bookCourse = () => {
     bookCourseTest(location.state.itemId);
+    handleUpdate();
   }
 
   const bookCourseTest = (id) =>{
@@ -507,21 +499,21 @@ const handleUpdate = (obj) => {
                     style={{ width: '500px' }}
                     fluid />
                 </MDBCardBody>
-                {!data.studentId  &&
+              {!data.studentId  &&
                 <Button onClick={() => bookCourse()} btnStyle="primary">Записаться на курс</Button>
-                }{data.studentId   &&
-                  <span>Вы уже подали заявку либо приняты на данный курс.</span>
                 }
               </MDBCard>
-
               <MDBCard className="mb-4 mb-lg-0">
                 <MDBCardBody className="p-0">
+                {data.mentorId &&
                   <button onClick={() => setShowModal(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
                     Добавить занятие
                   </button>
-
+              }
+              
+              {data.lessons && data.lessons.length > 0 &&
                   <Tabs>
-                    <TabList>
+                    <TabList> 
                       <Tab>Активные</Tab>
                       <Tab>Завершенные</Tab>
                       <Tab>Не начатые</Tab>
@@ -567,9 +559,9 @@ const handleUpdate = (obj) => {
                       </MDBListGroup>
                     </TabPanel>
                   </Tabs>
+                    }
                 </MDBCardBody>
               </MDBCard>
-
             </MDBCol>
             <MDBCol lg="8">
               <MDBCard className="mb-4">

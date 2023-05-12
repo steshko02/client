@@ -31,7 +31,7 @@ import Modal from "react-overlays/Modal";
 import WorksTable from "./WoksTable";
 
 
-let PageSize = 6;
+let PageSize = 3;
 export default function BoardMentors() {
  
   const token = AuthService.getCurrentJwt()
@@ -346,4 +346,15 @@ const API_URL = "http://localhost:8080/";
       </section>
       </>
   );
+}
+
+function WithLinks({text}) {
+
+  var res = []
+  
+  text && text.replace(/((?:https?:\/\/|ftps?:\/\/|\bwww\.)(?:(?![.,?!;:()]*(?:\s|$))[^\s]){2,})|(\n+|(?:(?!(?:https?:\/\/|ftp:\/\/|\bwww\.)(?:(?![.,?!;:()]*(?:\s|$))[^\s]){2,}).)+)/gim, (m, link, text) => {
+    res.push(link ? <a href={(link[0]==="w" ? "//" : "") + link} key={res.length}>{link}</a> : text)
+  })
+
+  return <div className="user-text">{res}</div>
 }
