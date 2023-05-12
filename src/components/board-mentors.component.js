@@ -27,6 +27,9 @@ import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import { Stack } from "@mui/material";
+import Modal from "react-overlays/Modal";
+import WorksTable from "./WoksTable";
+
 
 let PageSize = 6;
 export default function BoardMentors() {
@@ -79,7 +82,7 @@ const handleUpdate = (obj) => {
         <br/>
       <Tabs>
       <TabList>
-        <Tab>Заявки на курсы</Tab>
+        <Tab>Ваши занятия</Tab>
         <Tab>Список пользователей</Tab>
       </TabList>
       <TabPanel>
@@ -115,13 +118,13 @@ function Row({rowData, handleUpdate}) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
       </TableCell>
-        <TableCell>{rowData.title}</TableCell>
+        <TableCell><a>{rowData.title}</a></TableCell>
         <TableCell>{Helper.statusByFormat(rowData.status)}</TableCell>
         <TableCell>{Helper.dateByFormat(rowData.dateStart)} - {Helper.dateByFormat(rowData.dateEnd)}</TableCell>
         <TableCell>{rowData.mentors?.map((item) => (
-            <a href="#">{item.firstname} {item.lastname}</a>
+            <><a href="#">{item.firstname} {item.lastname}</a><br /></>
           ))}</TableCell>
-        <TableCell><div><MenuListComposition id={rowData.id} handleUpdate ={handleUpdate}/></div></TableCell>
+      
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -133,23 +136,28 @@ function Row({rowData, handleUpdate}) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell >Занятие</TableCell>
-                    <TableCell >Статус</TableCell>
-                    <TableCell >Менторы</TableCell>
+                    <TableCell ><b>Занятие</b></TableCell>
+                    <TableCell ><b>Статус</b></TableCell>
+                    <TableCell ><b>Время прохождения занятия</b></TableCell>
+                    <TableCell ><b>Менторы</b></TableCell>
                   </TableRow>
                 </TableHead>
-                {/* <TableBody>
-                    <TableRow key={rowData.user.uuid}>
-                      <TableCell component="th" scope="row">
-                        {rowData.user.uuid}
-                      </TableCell>
-                      <TableCell>{rowData.course.id}</TableCell>
-                      <TableCell >{rowData.user.email}</TableCell>
-                      <TableCell>
-                        {rowData.course.count ==='null' ? 0 +"/"+rowData.course.size: rowData.course.count +"/"+rowData.course.size}
-                      </TableCell>
-                    </TableRow>
-                </TableBody> */}
+                <TableBody>
+                  {rowData.lessons?.map((item) => (
+                   <TableRow key={item.id}>
+                   <TableCell component="th" scope="row">
+                   {item.title}
+                   </TableCell>
+                   <TableCell>{Helper.statusByFormat(item.status)}</TableCell>
+                   <TableCell >{Helper.dateByFormat(item.dateStart)} - {Helper.dateByFormat(item.dateEnd)}</TableCell>
+                   <TableCell>{item.mentors?.map((item) => (
+                    <><a href="#">{item.firstname} {item.lastname}</a><br /></>
+                  ))}</TableCell>
+                    <TableCell><div><MenuListComposition id={rowData.id} lessId ={item.id} handleUpdate ={handleUpdate}/></div></TableCell>
+                 </TableRow>  
+                  ))}
+                  
+                </TableBody>
               </Table>
             </Box>
           </Collapse>
@@ -167,10 +175,10 @@ function Row({rowData, handleUpdate}) {
         <TableHead>
           <TableRow>
           <TableCell />
-            <TableCell>Курс</TableCell>
-            <TableCell>Статус</TableCell>
-            <TableCell>Время</TableCell>
-            <TableCell>Менторы</TableCell>
+            <TableCell><b>Курс</b></TableCell>
+            <TableCell><b>Статус</b></TableCell>
+            <TableCell><b>Время</b></TableCell>
+            <TableCell><b>Менторы</b></TableCell>
             <TableCell></TableCell>
           </TableRow>
         </TableHead>
@@ -183,44 +191,28 @@ function Row({rowData, handleUpdate}) {
     </TableContainer>
   );
 }
+
+
 const API_URL = "http://localhost:8080/";
 
- function MenuListComposition({id, handleUpdate}) {
+ function MenuListComposition({lessId, handleUpdate}) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
 
   const token = AuthService.getCurrentJwt()
+  const [showModal, setShowModal] = useState(false);
+
+  const [selectLesson, setSelectLesson] = useState(0);
+
+
+  console.log(lessId);
+
+  const renderBackdrop = (props) => <div className="backdrop" {...props} />;
+  const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
 
   const config = {
       headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
   };
-
-  // const approve = () => {
-  //   const response = axios.post(API_URL + "bookings/approve/"+id,config);
-  // };
-
-  const approve = () =>{
-    var axios = require('axios');
-    var FormData = require('form-data');
-    var data = new FormData();
-
-    var config = {
-      method: 'post',
-      url: 'http://localhost:8080/bookings/approve/'+id,
-      headers: { 
-        'Authorization' : `Bearer ${token}`
-      },
-      data : data
-    };
-    axios(config)
-    .then(function (response) {
-      console.log(JSON.stringify(response.data));
-      handleUpdate();
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-  }
 
   const canceled = () =>{
     var axios = require('axios');
@@ -229,7 +221,7 @@ const API_URL = "http://localhost:8080/";
 
     var config = {
       method: 'post',
-      url: 'http://localhost:8080/bookings/canceled/'+id,
+      url: 'http://localhost:8080/bookings/canceled/'+lessId,
       headers: { 
         'Authorization' : `Bearer ${token}`
       },
@@ -245,10 +237,13 @@ const API_URL = "http://localhost:8080/";
     });
   }
 
-
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
+    setSelectLesson(lessId);
   };
+
+
+  var handleCloseModal = () => setShowModal(false);
 
   const handleClose = (ev) => {
     if (
@@ -280,50 +275,75 @@ const API_URL = "http://localhost:8080/";
   }, [open]);
 
   return (
-    <Stack direction="row" spacing={1}>
+    <> 
+     <section style={{ backgroundColor: '#eee' }}>
+      <Modal
+      className="modal"
+      show={showModal}
+      onHide={() => setShowModal(false)}
+      renderBackdrop={renderBackdrop}
+    >
       <div>
-      <Button
-      ref={anchorRef}
-      id="composition-button"
-      aria-controls={open ? 'composition-menu' : undefined}
-      aria-expanded={open ? 'true' : undefined}
-      aria-haspopup="true"
-      onClick={handleToggle}
-    >
-      Выполнить
-    </Button>
-    <Popper
-      open={open}
-      anchorEl={anchorRef.current}
-      role={undefined}
-      placement="bottom-start"
-      transition
-      disablePortal
-    >
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin: placement === 'bottom-start' ? 'left top' : 'left bottom',
-            }}
-          >
-            <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MenuList
-                  autoFocusItem={open}
-                  id="composition-menu"
-                  aria-labelledby="composition-button"
-                  onKeyDown={handleListKeyDown}
-                >
-                  <MenuItem onClick={approve}>Подтвердить</MenuItem>
-                  <MenuItem onClick={canceled}>Отклонить</MenuItem>
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
-      </Popper>
+        <div className="modal-header modal-header">
+          <div className="modal-title modal-title">Modal Heading</div>
+          <div>
+            <span className="close-button course" onClick={() => setShowModal(false)}>
+              x
+            </span>
+          </div>
+        </div>
+        <WorksTable lessonId ={lessId} />
       </div>
+  
+    </Modal>
+
+    <Stack direction="row" spacing={1}>
+        <div>
+          <Button
+            ref={anchorRef}
+            id="composition-button"
+            aria-controls={open ? 'composition-menu' : undefined}
+            aria-expanded={open ? 'true' : undefined}
+            aria-haspopup="true"
+            onClick={handleToggle}
+          >
+            Изменить
+          </Button>
+          <Popper
+            open={open}
+            anchorEl={anchorRef.current}
+            role={undefined}
+            placement="bottom-start"
+            transition
+            disablePortal
+          >
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                style={{
+                  transformOrigin: placement === 'bottom-start' ? 'left top' : 'left bottom',
+                }}
+              >
+                <Paper>
+                  <ClickAwayListener onClickAway={handleClose}>
+                    <MenuList
+                      autoFocusItem={open}
+                      id="composition-menu"
+                      aria-labelledby="composition-button"
+                      onKeyDown={handleListKeyDown}
+                    >
+                      <MenuItem onClick={() => setShowModal(true)}>Выполненные работы</MenuItem>
+                      <MenuItem onClick={canceled}>Изменить занятие</MenuItem>
+                      <MenuItem onClick={canceled}>Изменить задание</MenuItem>
+                    </MenuList>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
+          </Popper>
+        </div>
       </Stack>
+      </section>
+      </>
   );
 }
