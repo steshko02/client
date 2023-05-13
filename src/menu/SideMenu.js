@@ -60,6 +60,8 @@ export const SideMenu = ({ children }) => {
 const currentUser = AuthService.getCurrentUser()
 const showAdminBoard = currentUser ? currentUser.roles.includes("ROLE_ADMIN") : false
 const showUserBoard = currentUser ? currentUser.roles.includes("ROLE_USER") : false
+const showMentorBoard = currentUser ? currentUser.roles.includes("ROLE_LECTURER") : false
+const showStudentBoard = currentUser ? currentUser.roles.includes("ROLE_STUDENT") : false
 
 
 SideMenu.propTypes = {
@@ -76,13 +78,24 @@ SideMenu.defaultProps = {
       <MenuLink href="/">Главная</MenuLink>
       <MenuLink href="/courses">Курсы</MenuLink>
       <MenuLink href="/profile">Профиль</MenuLink>
-      <MenuLink href="/admin">Админитратор</MenuLink>
-      <MenuLink href="/mentors">Ментор</MenuLink>
       </>
      )} 
      { showAdminBoard && (
       <>
+      <MenuLink href="/admin">Админитратор</MenuLink>
       <MenuLink href="/users">Пользователи</MenuLink>
+      <MenuLink href="/courses">Курсы</MenuLink>
+      <MenuLink href="/profile">Профиль</MenuLink>
+      </>
+     )} 
+          { showMentorBoard && (
+      <>
+      <MenuLink href="/mentors">Ментор</MenuLink>
+      </>
+     )} 
+          { showStudentBoard && (
+      <>
+      <MenuLink href="/learn-process">Учебный процесс</MenuLink>
       </>
      )} 
     </>

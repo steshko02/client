@@ -6,6 +6,10 @@
   width: 800px;
 }
 
+.small_font{
+  font-size: 14px;
+}
+
 .modal.modal {
   position: fixed;
   display: block;

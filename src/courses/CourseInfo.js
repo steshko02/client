@@ -21,7 +21,13 @@ import '@trendmicro/react-buttons/dist/react-buttons.css';
 
 const API_URL = "http://localhost:8080/";
 
-function LessonForm({handleUpdate}){
+  const currentUser = AuthService.getCurrentUser()
+  const showAdminBoard = currentUser ? currentUser.roles.includes("ROLE_ADMIN") : false
+  const showUserBoard = currentUser ? currentUser.roles.includes("ROLE_USER") : false
+  const showMentorBoard = currentUser ? currentUser.roles.includes("ROLE_LECTURER") : false
+  const showStudentBoard = currentUser ? currentUser.roles.includes("ROLE_STUDENT") : false
+
+  function LessonForm({handleUpdate}){
 
   const location = useLocation();
   const token = AuthService.getCurrentJwt()
@@ -499,13 +505,13 @@ const handleUpdate = (obj) => {
                     style={{ width: '500px' }}
                     fluid />
                 </MDBCardBody>
-              {!data.studentId  &&
+              {!data.studentId  && !showAdminBoard && !showMentorBoard &&
                 <Button onClick={() => bookCourse()} btnStyle="primary">Записаться на курс</Button>
                 }
               </MDBCard>
               <MDBCard className="mb-4 mb-lg-0">
                 <MDBCardBody className="p-0">
-                {data.mentorId &&
+                {data.mentorId !=="" || showAdminBoard &&
                   <button onClick={() => setShowModal(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
                     Добавить занятие
                   </button>
@@ -514,9 +520,9 @@ const handleUpdate = (obj) => {
               {data.lessons && data.lessons.length > 0 &&
                   <Tabs>
                     <TabList> 
-                      <Tab>Активные</Tab>
-                      <Tab>Завершенные</Tab>
-                      <Tab>Не начатые</Tab>
+                      <Tab><span className="small_font">Активные</span></Tab>
+                      <Tab><span className="small_font">Завершенные</span></Tab>
+                      <Tab><span className="small_font">Не начатые</span></Tab>
                     </TabList>
 
                     <TabPanel>
@@ -567,70 +573,70 @@ const handleUpdate = (obj) => {
               <MDBCard className="mb-4">
                 <MDBCardBody>
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Название</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">{data.title}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Начало курса</MDBCardText>
                       <MDBCardText>Конец курса</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">{Helper.dateByFormat(data.dateStart)}</MDBCardText>
                       <MDBCardText className="text-muted">{Helper.dateByFormat(data.dateEnd)}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Свободных мест</MDBCardText>
                       <MDBCardText>Количество мест</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="3">
                       <MDBCardText className="text-muted">{data.size}</MDBCardText>
                       <MDBCardText className="text-muted">{data.size}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Статус</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">{Helper.statusByFormat(data.status)}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Технологии</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">Bay Area, San Francisco, CA</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Описание</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">{data.description}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Менторы</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">{data.mentors?.map((items) => {
-                                   return <a href="#" id = {items.id}>{items.firstname} {items.lastname}</a>;
+                                   return <><a href="#" id={items.id}>{items.firstname} {items.lastname}</a><br /></>;
                               })}
                          </MDBCardText>
                     </MDBCol>

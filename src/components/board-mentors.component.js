@@ -1,10 +1,7 @@
-import EventBus from "../common/EventBus";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import React, { useEffect, useState,useMemo } from 'react';
-import { useNavigate } from "react-router-dom";
 import Pagination from "../services/Pagination";
 import axios from "axios";
-import http from "../http-common";
 import AuthService from "../services/auth.service";
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -54,11 +51,12 @@ const handleUpdate = (obj) => {
 };
 
   useEffect(() => {
-    axios.get("http://localhost:8080/courses/bymentors",
+    axios.get("http://localhost:8080/courses/byRole",
     {
       params: {
         "number": pagination.currentPage-1,
-        "size": PageSize
+        "size": PageSize,
+        "role": 'LECTURER'
       },
       headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
     },

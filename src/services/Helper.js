@@ -30,6 +30,16 @@ class Helper {
     return "Неизвестный"
   }
 
+  statusByFormatForTask(status) {
+    if(status==="DURING"){
+     return "В срок"
+    }
+    if(status==="FINISHED"){
+     return "Просрочено"
+    }
+   
+     return "Неизвестный"
+   }
 }
 
 export default new Helper();

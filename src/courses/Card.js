@@ -25,8 +25,9 @@ let PageSize = 4;
 function Cards() {
 
     const token = AuthService.getCurrentJwt()
+    const currentUser = AuthService.getCurrentUser()
+    const showAdminBoard = currentUser ? currentUser.roles.includes("ROLE_ADMIN") : false
 
-    // const [number, setNumber] = useState(0);
 
     const [pagination, setPagination] = useState({
       currentPage: 1,
@@ -146,9 +147,11 @@ const handleUpdate = (obj) => {
         onPageChange={page => setPagination({
           ...pagination,
         currentPage: page })} />
+        {showAdminBoard &&
         <button onClick={() => setShowModal(true)} type="button" class="btn btn-link fixed" data-mdb-ripple-color="dark">
                     Добавить курс
         </button>
+        }
         </div>
         </>
   );
@@ -308,7 +311,7 @@ const selectedChange = (ev) => {
                   <Form  
                     onSubmit={postCourse}
                       >
-                    <div className="mbsc-row mbsc-justify-content-center scroll">
+                    <div className="mbsc-row mbsc-justify-content-center">
                         <div className="mbsc-col-md-10 mbsc-col-xl-8 mbsc-form-grid">
                             <div className="mbsc-form-group-title">New lesson form</div>
                             <div className="mbsc-row">

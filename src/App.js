@@ -7,9 +7,9 @@ import AuthService from "./services/auth.service";
 import Login from "./components/login.component";
 import Register from "./components/register.component";
 import Home from "./components/home.component";
-import BoardUser from "./components/board-user.component";
 import BoardMentors from "./components/board-mentors.component";
 import BoardAdmin from "./components/board-admin.component";
+import BoardUser from "./components/board-user.component";
 import Cards from "./courses/Card";
 import { useNavigate } from "react-router-dom";
 
@@ -82,12 +82,12 @@ class App extends Component {
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/user" element={<BoardUser />} />
             <Route path="/mentors" element={<BoardMentors />} />
             <Route path="/admin" element={<BoardAdmin />} />
             <Route path="/courses" element={<Cards />} />
             <Route path="/course-info" element={<CourseInfo />} />
             <Route path="/lesson" element={<Lessoninfo />} />
+            <Route path="/learn-process" element={<BoardUser />} />
           </Routes>
            <AuthVerify logOut={this.logOut} />
 

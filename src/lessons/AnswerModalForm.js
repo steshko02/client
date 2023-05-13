@@ -14,7 +14,7 @@ import Player from "../components/Player";
 import Helper from "../services/Helper"
 
 const API_URL = "http://localhost:8080/";
-export default function AnswerForm({handleUpdate, workId}){
+export default function AnswerForm({handleUpdate, work, data, update}){
 
     const location = useLocation();
     const token = AuthService.getCurrentJwt()
@@ -23,14 +23,15 @@ export default function AnswerForm({handleUpdate, workId}){
     };
 
     const [answer, setAnswer] = useState({
-        answerId: 0,
-        workId: workId.id,
-        comment: ""
+        id: data?.id,
+        workId: work.id,
+        comment: data?.comment
     });
   
   
     const [files, setFiles] = useState({
-        selectedFiles: undefined,
+        selectedFiles: undefined ,
+        // data?.resource[0].url,
         selectVideoFile: undefined,
         videoLink: "",
         currentFile: undefined,
@@ -93,6 +94,48 @@ export default function AnswerForm({handleUpdate, workId}){
       });
     };
   
+
+  const postOrUpdateAnswer = (e) =>{
+    if(!update){
+      postAnswer(e);
+    } else {
+      updateAnswer(e);
+    }
+  }
+
+  const updateAnswer = (e) =>{
+    e.preventDefault();
+    const answerData = answer;
+    var axios = require('axios');
+    var FormData = require('form-data');
+    var data = new FormData();
+    setAnswer({
+        ...answer,
+        workId: work
+      })
+    var config = {
+      method: 'put',
+      url: API_URL + "answer",
+      headers: { 
+        'Authorization' : `Bearer ${token}`
+      },
+      data : answerData
+    };
+    axios(config)
+    .then((response) => {
+        const answerId = response.data;
+        setAnswer({
+          ...answer,
+          answerId: answerId
+        })
+          if(files.selectedFiles.length!==0){
+          upload(answerId);
+      }
+      }
+      ).then(resp=>handleUpdate(1));
+  }
+
+
     const postAnswer = (e) =>{
         e.preventDefault();
         const answerData = answer;
@@ -101,7 +144,7 @@ export default function AnswerForm({handleUpdate, workId}){
         var data = new FormData();
         setAnswer({
             ...answer,
-            workId: workId
+            workId: work
           })
         var config = {
           method: 'post',
@@ -130,7 +173,7 @@ export default function AnswerForm({handleUpdate, workId}){
               <div className="mbsc-grid mbsc-grid-fixed">
                   <div className="mbsc-form-group">
                     <Form  
-                      onSubmit={postAnswer}
+                      onSubmit={postOrUpdateAnswer}
                         >
                       <div className="mbsc-row mbsc-justify-content-center scroll">
                           <div className="mbsc-col-md-1 mbsc-col-xl-8 mbsc-form-grid">
@@ -141,9 +184,10 @@ export default function AnswerForm({handleUpdate, workId}){
                                    labelStyle="stacked" startIcon="pencil"
                                    placeholder="Комментарии" label="Комментарии"
                                    onChange={handleChange}
+                                   value = {answer.comment}
                                    ></Textarea>
                                   </div>
-                                <input type="hidden" value={workId.id}></input>
+                                <input type="hidden" value={work.id}></input>
                                   <div className="mbsc-col-md-12 mbsc-col-12">
                                   <Input onChange={selectFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Select text files..." label="Files upload"></Input>
                                   </div>

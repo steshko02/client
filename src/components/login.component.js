@@ -36,7 +36,7 @@ class Login extends Component {
     this.onChangePassword = this.onChangePassword.bind(this);
 
     this.state = {
-      email: "alesd@mail.ru",
+      email: "Admin@mail.ru",
       password: "KJDHFsd!43kjkeAAAdfsdf",
       loading: false,
       message: ""

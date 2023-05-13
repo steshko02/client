@@ -128,15 +128,15 @@ function Row({rowData, handleUpdate}) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
-                Пользователь
+                Детали
               </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell >Id пользователя</TableCell>
-                    <TableCell >Id курса</TableCell>
-                    <TableCell >Email</TableCell>
-                    <TableCell >Свободных мест/всего мест</TableCell>
+                    <TableCell ><b>Id пользователя</b></TableCell>
+                    <TableCell ><b>Id курса</b></TableCell>
+                    <TableCell ><b>Email</b></TableCell>
+                    <TableCell ><b>Свободных мест/всего мест</b></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -168,11 +168,11 @@ function Row({rowData, handleUpdate}) {
         <TableHead>
           <TableRow>
           <TableCell />
-            <TableCell>ID заявки</TableCell>
-            <TableCell>Время</TableCell>
-            <TableCell>Курс</TableCell>
-            <TableCell>Пользователь</TableCell>
-            <TableCell>Статус заявки</TableCell>
+            <TableCell><b>ID заявки</b></TableCell>
+            <TableCell><b>Время</b></TableCell>
+            <TableCell><b>Курс</b></TableCell>
+            <TableCell><b>Пользователь</b></TableCell>
+            <TableCell><b>Статус заявки</b></TableCell>
             <TableCell></TableCell>
           </TableRow>
         </TableHead>
