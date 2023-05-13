@@ -87,7 +87,7 @@ const handleUpdate = (obj) => {
       >
         <div>
           <div className="modal-header modal-header">
-            <div className="modal-title modal-title">Modal Heading</div>
+            <div className="modal-title modal-title">Форма создания задания</div>
             <div>
               <span className="close-button course" onClick={handleClose}>
                 x
@@ -113,7 +113,7 @@ const handleUpdate = (obj) => {
       >
         <div>
           <div className="modal-header modal-header">
-            <div className="modal-title modal-title">Modal Heading</div>
+            <div className="modal-title modal-title">Форма добавления работы</div>
             <div>
               <span className="close-button course" onClick={handleAnswerClose}>
                 x
@@ -241,9 +241,7 @@ const handleUpdate = (obj) => {
               )}
 
               </MDBCard>
-                  
-
-
+                
             </MDBCol>
             <MDBCol lg="6">
               <MDBCard className="mb-4">
@@ -292,7 +290,7 @@ const handleUpdate = (obj) => {
                     </MDBCol>
                     <MDBCol sm="9">
                       <MDBCardText className="text-muted">{data.mentors?.map((items) => {
-                                   return <a href="#" id = {items.id}>{items.firstname} {items.lastname}</a>;
+                                   return <><a href="#" id={items.id}>{items.firstname} {items.lastname}</a><br /></>;
                               })}
                          </MDBCardText>
                     </MDBCol>
