@@ -16,7 +16,11 @@ import AnswerForm from "./AnswerModalForm"
 
 const API_URL = "http://localhost:8080/";
 
-
+const currentUser = AuthService.getCurrentUser()
+const showAdminBoard = currentUser ? currentUser.roles.includes("ROLE_ADMIN") : false
+const showUserBoard = currentUser ? currentUser.roles.includes("ROLE_USER") : false
+const showMentorBoard = currentUser ? currentUser.roles.includes("ROLE_LECTURER") : false
+const showStudentBoard = currentUser ? currentUser.roles.includes("ROLE_STUDENT") : false
 function LessonInfo() {
 
     const token = AuthService.getCurrentJwt()
@@ -26,6 +30,7 @@ function LessonInfo() {
  
     const [showModal, setShowModal] = useState(false);
     const [showAnswerModal, setShowAnswerModal] = useState(false);
+    const [isAdminOrMentor, setIsAdminOrMentor] = useState(false);
 
   
     const [addWork, setaddWork] = useState(0);
@@ -41,6 +46,8 @@ function LessonInfo() {
         setdata(response.data);
         if(response.data.work){
         setaddWork(response.data.work.id);
+        setIsAdminOrMentor(showAdminBoard || (data.userId===null ||  data.mentorId===""));
+
         }
             });
     },
@@ -71,7 +78,6 @@ const handleUpdate = (obj) => {
   setaddWork(addWork+obj);
   handleClose();
 };
-
 
   const renderBackdrop = (props) => <div className="backdrop" {...props} />;
   const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
@@ -121,7 +127,7 @@ const handleUpdate = (obj) => {
             </div>
           </div>
 
-          <AnswerForm handleUpdate={handleUpdate} workId={data.work}/>
+          <AnswerForm handleUpdate={handleUpdate} handleAnswerClose={handleAnswerClose} work={data.work} update={false}/>
 
           <div className="modal-footer course">
             <button className="secondary-button course" onClick={handleAnswerClose}>
@@ -154,15 +160,15 @@ const handleUpdate = (obj) => {
                     </MDBCol>
                   </MDBRow>
                   <MDBRow className="mb-4">
-                    <MDBCol sm="5">
+                    <MDBCol sm="2">
                       <MDBCardText>Дедлайн</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="7">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">{Helper.dateByFormat(data.work.deadline)}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <MDBRow>
-                  <MDBCol sm="10">
+                  <MDBCol sm="2">
                       <MDBCardText>Описание:</MDBCardText>
                   </MDBCol>
                     <MDBCol>
@@ -232,11 +238,10 @@ const handleUpdate = (obj) => {
                   </MDBRow>
                 </MDBCardBody>
                 )}
-                { data.work && !data.answer && 
-                // data.studentId && 
+                { data.work!==null && data.answer===null && !isAdminOrMentor && data.studentId!==null && 
                 (
               <button onClick={() => setShowAnswerModal(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                    Ответить на задание
+                    Прикрепить работу
                   </button>
               )}
 
@@ -247,48 +252,48 @@ const handleUpdate = (obj) => {
               <MDBCard className="mb-4">
                 <MDBCardBody>
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Название</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">{data.title}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Начало занятия</MDBCardText>
                       <MDBCardText>Конец занятия</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                     <MDBCardText className="text-muted">{Helper.dateByFormat(data.dateStart)}</MDBCardText>
                       <MDBCardText className="text-muted">{Helper.dateByFormat(data.dateEnd)}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Статус</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">{Helper.statusByFormat(data.status)}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Описание</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">{data.description}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
-                    <MDBCol sm="3">
+                    <MDBCol sm="4">
                       <MDBCardText>Менторы</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="9">
+                    <MDBCol sm="8">
                       <MDBCardText className="text-muted">{data.mentors?.map((items) => {
                                    return <><a href="#" id={items.id}>{items.firstname} {items.lastname}</a><br /></>;
                               })}
@@ -370,18 +375,6 @@ function WorkForm({handleUpdate}){
       fileInfos: [],
   });
 
-  // useEffect(() => {
-  //   const userData = [];
-  //   getUsers(location.state.itemId)
-  //   .then(response =>
-  //     setUsers(response.data?.map((items) => {
-  //        return {text: items.firstname +" "+ items.lastname, value: items.uuid}
-  // })
-  //   ))
-  //   .then(setUsers(userData))
-  //   .then(console.log(users))
-  // }, []);
-
   const upload = (id) => {
     let currentFile = files.selectedFiles[0];
 
@@ -397,7 +390,7 @@ function WorkForm({handleUpdate}){
         });
     })
       .then((response) => {
-        handleUpdate(1);
+        handleUpdate(2);
         setFiles({
           ...files,
           message: response.data.message,

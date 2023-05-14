@@ -53,12 +53,11 @@ const API_URL = "http://localhost:8080/";
 
   
   const selectedChange = (ev) => {
-    setLesson({
-      ...lesson,
-      userIds: ev.value
-    })
+      setLesson({
+        ...lesson,
+        userIds: ev.value
+      })
      };
-
 
   const [lesson, setLesson] = useState({
       courseId: location.state.itemId,
@@ -260,13 +259,13 @@ const getUsers = (id) => {
 // }, [remoteFiltering]);
 
   return(
-      <Page>
-            <div className="mbsc-grid mbsc-grid-fixed">
+      <Page >
+            <div className="mbsc-grid mbsc-grid-fixed scroll">
                 <div className="mbsc-form-group">
                   <Form  
                     onSubmit={postLesson}
                       >
-                    <div className="mbsc-row mbsc-justify-content-center scroll">
+                    <div className="mbsc-row mbsc-justify-content-center">
                         <div className="mbsc-col-md-10 mbsc-col-xl-8 mbsc-form-grid">
                             <div className="mbsc-form-group-title">New lesson form</div>
                             <div className="mbsc-row">
@@ -358,6 +357,7 @@ const getUsers = (id) => {
     const [addLesson, setaddLesson] = useState(0);
     const [lessArray, setLessArray] = useState([]);
     const [book, setBook] = useState(false);
+    const [isAdminOrMentor, setIsAdminOrMentor] = useState(false);
 
 
     const config = {
@@ -371,7 +371,8 @@ const getUsers = (id) => {
         console.log(response.data);
         setdata(response.data);
         setaddLesson(response.data.lessons.length);
-
+        setIsAdminOrMentor((showAdminBoard|| response.data.mentorId!==null));
+        console.log(isAdminOrMentor);
         setLessArray( response.data.lessons.reduce((group, lesson) => {
           const { status } = lesson;
           group[status] = group[status] ?? [];
@@ -485,12 +486,6 @@ const handleUpdate = (obj) => {
           </div>
 
           <LessonForm handleUpdate={handleUpdate}/>
-
-          <div className="modal-footer course">
-            <button className="secondary-button course" onClick={handleClose}>
-              Close
-            </button>
-          </div>
         </div>
       </Modal>
 
@@ -511,7 +506,7 @@ const handleUpdate = (obj) => {
               </MDBCard>
               <MDBCard className="mb-4 mb-lg-0">
                 <MDBCardBody className="p-0">
-                {data.mentorId !=="" || showAdminBoard &&
+                { isAdminOrMentor &&
                   <button onClick={() => setShowModal(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
                     Добавить занятие
                   </button>
@@ -594,11 +589,11 @@ const handleUpdate = (obj) => {
                   <hr />
                   <MDBRow>
                     <MDBCol sm="4">
-                      <MDBCardText>Свободных мест</MDBCardText>
-                      <MDBCardText>Количество мест</MDBCardText>
+                      <MDBCardText>Занято мест</MDBCardText>
+                      <MDBCardText>Набор</MDBCardText>
                     </MDBCol>
                     <MDBCol sm="3">
-                      <MDBCardText className="text-muted">{data.size}</MDBCardText>
+                      <MDBCardText className="text-muted">{data?.busy}</MDBCardText>
                       <MDBCardText className="text-muted">{data.size}</MDBCardText>
                     </MDBCol>
                   </MDBRow>

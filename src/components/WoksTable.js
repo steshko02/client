@@ -22,10 +22,10 @@ import Helper from "../services/Helper"
 import Paper from '@mui/material/Paper';
 import { Button, Dropdown, Input, Page, setOptions,Textarea,Datepicker,Stepper, Select, Checkbox } from '@mobiscroll/react';
 import Form from "react-validation/build/form";
-
+import "./status.css"
 const API_URL = "http://localhost:8080/";
 
-let PageSize = 2;
+let PageSize = 10;
 export default function WorksTable({lessonId}) {
 
     const token = AuthService.getCurrentJwt()
@@ -42,18 +42,32 @@ export default function WorksTable({lessonId}) {
         totalPages: 0,
         totalCount: 0,
     });
-
+    
+    const [filter, setfilter] = useState({
+      user: '',
+      status: ''
+    });
+    
     const handleUpdate = (obj) => {
         setaddLesson(addLesson+obj);
       };
       
+      const handleChange = (e) => {
+        const value = e.target.value;
+        setfilter({
+          ...filter,
+          [e.target.name]: value
+        });
+      };
 
     useEffect(() => {
         axios.get("http://localhost:8080/answer/byLesson/"+lessonId,
         {
             params: {
               "number": pagination.currentPage-1,
-              "size": PageSize
+              "size": PageSize,
+              "user": filter.user,
+              "status": filter.status
             },
             headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
           },
@@ -68,19 +82,27 @@ export default function WorksTable({lessonId}) {
           setaddLesson(response.data.answers.length);
         });
       },
-  [pagination.currentPage, addLesson]);
+  [pagination.currentPage, addLesson,filter]);
 
     return (
-      <><TableContainer component={Paper}>
+      <>
+       <span> Пользователь </span><input name="user" onChange={handleChange}></input>
+       <span> Статус </span><select name="status" onChange={handleChange}>
+       <option value="All">Все</option>
+        <option value="DURING">В срок</option>
+        <option value="FINISHED">Просрочено</option>
+       </select>
+        <div className="scroll-605">
+      <TableContainer component={Paper}>
             <Table aria-label="collapsible table">
                 <TableHead>
                     <TableRow>
                         <TableCell />
-                        <TableCell><span>Ученик</span></TableCell>
-                        <TableCell>Статус</TableCell>
-                        <TableCell>Задание</TableCell>
-                        <TableCell>Время сдачи</TableCell>
-                        <TableCell>Отметка</TableCell>
+                        <TableCell><b><span>Ученик</span></b></TableCell>
+                        <TableCell><b>Статус</b></TableCell>
+                        <TableCell><b>Задание</b></TableCell>
+                        <TableCell><b>Время сдачи</b></TableCell>
+                        <TableCell><b>Отметка</b></TableCell>
                         <TableCell></TableCell>
                     </TableRow>
                 </TableHead>
@@ -98,7 +120,7 @@ export default function WorksTable({lessonId}) {
                 onPageChange={page => setPagination({
                     ...pagination,
                     currentPage: page
-                })} /></>
+                })} /></div></>
     );
   }
 
@@ -111,7 +133,7 @@ export default function WorksTable({lessonId}) {
     const [makr, setMark] = useState({
         id: 0,
         comment: rowData.result!==null? rowData.result.comment : '',
-        answerId: rowData.id,
+        answerId: rowData.id!==null? rowData.id : '',
         date: '',
         mark: rowData.result!==null? rowData.result.mark : ''
       });
@@ -129,11 +151,11 @@ export default function WorksTable({lessonId}) {
         });
       };
 
-
     const postMark = (e) =>{
         e.preventDefault();
         const markData = makr;
-        
+        setShow(false);
+
         var axios = require('axios');
         var FormData = require('form-data');
         var data = new FormData();
@@ -152,7 +174,8 @@ export default function WorksTable({lessonId}) {
                 ...makr,
                 id: respId
               });
-          }
+              setShow(false);
+            }
           )
           .then(resp=>handleUpdate(1));
       }
@@ -170,10 +193,10 @@ export default function WorksTable({lessonId}) {
             </IconButton>
         </TableCell>
         <TableCell><a href="#">{rowData.user.firstname} {rowData.user.lastname}</a></TableCell>
-          <TableCell>{Helper.statusByFormat(rowData.timeStatus)}</TableCell>
+          <TableCell><b><span className={rowData.timeStatus}>{Helper.statusByFormatForTask(rowData.timeStatus)}</span></b></TableCell>
           <TableCell>Название задания</TableCell>
           <TableCell>{Helper.dateByFormat(rowData.date)}</TableCell>
-          <TableCell>{rowData.result &&  rowData.result.mark} </TableCell>
+          <TableCell><b>{rowData.result &&  rowData.result.mark}</b></TableCell>
         </TableRow>
         <TableRow>
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -188,9 +211,11 @@ export default function WorksTable({lessonId}) {
                         {items.filename}</a>)
                     })}
                     <br/>
+                    <br/>
+                    <span>Комментарий:</span><br/>
+                    <span><WithLinks text ={rowData.result?.comment}></WithLinks></span>   
                     {!rowData.result && <Button  onClick={() => setShow(!show)}>Оценить работу</Button>}
-                    {rowData.result && <Button  onClick={() => setShow(!show)}>Редактировать оценку работы</Button>}
-
+                    {rowData.result && <Button  onClick={() => setShow(!show)}>Редактировать отзыв к работе</Button>}
                     {show &&
                 <Form  onSubmit={postMark}  >
                                 <Input name="mark" 
