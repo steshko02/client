@@ -21,7 +21,7 @@ import Helper from "../services/Helper"
 const API_URL = "http://localhost:8080/";
 
 
-let PageSize = 4;
+let PageSize = 10;
 function Cards() {
 
     const token = AuthService.getCurrentJwt()
@@ -100,7 +100,7 @@ const handleUpdate = (obj) => {
           id={items.id} />;
       })}
     </div>
-    <div>
+    <div className="course_filter">
     <Select
         placeholder="Отобразить ..."
         data={filter_data}
@@ -129,7 +129,7 @@ const handleUpdate = (obj) => {
             </div>
           </div>
 
-          <CourseForm handleUpdate={handleUpdate}/>
+          <CourseForm  handleUpdate={handleUpdate}/>
 
           <div className="modal-footer course">
             <button className="secondary-button course" onClick={handleClose}>
@@ -200,21 +200,18 @@ function CourseForm({handleUpdate}){
   const [users, setUsers] = useState([]);
   
   useEffect(() => {
-    const userData = [];
-    getUsers()
-    .then(response =>
-      setUsers(response.data?.map((items) => {
-         return {text: items.firstname +" "+ items.lastname, value: items.uuid}
-  })
-    ))
-    .then(setUsers(userData))
-    .then(console.log(users))
+    remoteFiltering('');
   }, []);
 
 
-const getUsers = () => {
+const getUsers = (filterText) => {
   const response = axios.get("http://localhost:8080/users",
-    config
+  {
+  params: {
+    "username":filterText
+  },
+  headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
+}
   );
   return response;
 }
@@ -258,7 +255,8 @@ const selectedChange = (ev) => {
    const postCourse = (e) => {
     e.preventDefault();
     const courseData = course;
-    const response = axios.post(API_URL + "courses", courseData,config).then(
+    const response = axios.post(API_URL + "courses", courseData,config)
+    .then(handleUpdate(1)
     ).then(response => uploadPicture(response.data).then(resp=>handleUpdate(1)));
     };
 
@@ -304,8 +302,24 @@ const selectedChange = (ev) => {
     });
   }
 
+  const remoteFiltering = React.useCallback((filterText) => {
+    const userData = [];
+    getUsers(filterText)
+    .then(response =>
+      setUsers(response.data?.map((items) => {
+         return {text: items.firstname +" "+ items.lastname, value: items.uuid}
+  })
+    ))
+    .then(console.log(users))
+}, []);
+
+  const userFilter = React.useCallback((ev) => {
+    remoteFiltering(ev.filterText);
+    return false;
+}, [remoteFiltering]);
+
   return(
-      <Page>
+      <Page className="scroll">
             <div className="mbsc-grid mbsc-grid-fixed">
                 <div className="mbsc-form-group">
                   <Form  
@@ -350,7 +364,17 @@ const selectedChange = (ev) => {
                                     inputStyle="box"
                                     onChange={selectedChange}
                                     filter = {true}
+                                    onFilter={userFilter}
                                 />  
+                          {/* <Select
+                            data={users}
+                            display="anchored"
+                            filter={true}
+                            label="Remote data"
+                            inputStyle="box"
+                            onFilter={userFilter}
+                            onChange={selectedChange}
+                        /> */}
                                 </div>
                                 <div className="mbsc-col-md-12 mbsc-col-10">
                                 <Textarea name="description" inputStyle="box" 
@@ -361,7 +385,7 @@ const selectedChange = (ev) => {
                                 </div>
                               
                                 <div className="mbsc-col-md-12 mbsc-col-10">
-                                <Input name="size" onChange={handleChange} multiple inputStyle="box" labelStyle="stacked" type="number" placeholder="Input size..." label="Size"></Input>
+                                <Input name="size" min="1" max = "100" onChange={handleChange} multiple inputStyle="box" labelStyle="stacked" type="number" placeholder="Input size..." label="Size"></Input>
                                 </div>
 
                                 <div className="mbsc-col-md-12 mbsc-col-10">

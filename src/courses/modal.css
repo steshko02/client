@@ -10,6 +10,13 @@
   font-size: 14px;
 }
 
+.course_filter{
+  width: 160px;
+  right: 25px;
+  top: 85px;
+  position: fixed;
+}
+
 .modal.modal {
   position: fixed;
   display: block;
@@ -108,7 +115,14 @@ button.course {
   display: none;
 }
 
-.scroll {
-  height: auto;
-   overflow: scroll;
+.scroll{
+  overflow-y: auto;
+  flex: 1;
+  max-height: 630px;
+}
+
+.scroll.scroll-605{
+  overflow-y: auto;
+  flex: 1;
+  max-height: 605px;
 }

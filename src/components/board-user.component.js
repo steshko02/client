@@ -29,7 +29,7 @@ import WorksTable from "./WoksTable";
 import {Dropdown, Input, Page, setOptions,Textarea,Datepicker,Stepper, Select, Checkbox } from '@mobiscroll/react';
 import Form from "react-validation/build/form";
 import AnswerForm from '../lessons/AnswerModalForm'
-
+import "./status.css"
 
 let PageSize = 3;
 export default function BoardUser() {
@@ -236,13 +236,13 @@ const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
 
                 <TableBody>
                   <TableRow>
-                    <TableCell>{Helper.statusByFormatForTask(post.answer.timeStatus)}</TableCell>
+                    <TableCell><span className={post.work.status}><b>{Helper.statusByFormatForTask(post.answer.timeStatus)}</b></span></TableCell>
                     <TableCell>{Helper.dateByFormat(post.answer.date)}</TableCell>
-                    <TableCell><b>{post.checkWork.mark}</b></TableCell>
+                    <TableCell><b>{post?.checkWork?.mark}</b></TableCell>
                     <TableCell>
-                      <><a href="#">{post.checkWork.mentor.firstname} {post.checkWork.mentor.lastname}</a><br /></>
+                      <><a href="#">{post?.checkWork?.mentor.firstname} {post?.checkWork?.mentor.lastname}</a><br /></>
                     </TableCell>
-                    <TableCell>{post.checkWork.comment}</TableCell>
+                    <TableCell>{post?.checkWork?.comment}</TableCell>
                     </TableRow>
                   </TableBody>
               </>
@@ -254,8 +254,8 @@ const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
 
                   <>
                   <span><b>Задание: </b></span><span>{post.work.title}</span><br/>
-                  <span><b>Дедлайн: </b> </span><span>{Helper.dateByFormat(post.work.deadline)}</span><br/>
-                  <span><b>Статус: </b> </span><span>{Helper.statusByFormat(post.work.status)}</span><br/>
+                  <span><b>Дедлайн: </b> </span><span >{Helper.dateByFormat(post.work.deadline)}</span><br/>
+                  <span><b>Статус: </b> </span><span className={post.work.status}>{Helper.statusByFormat(post.work.status)}</span><br/>
                   <span><b>Описание: </b> </span><span><WithLinks text={post.work.description}/></span><br/>
                   <span><b>Прикрепленные файлы: </b></span><br/>
                   {post.work.resource?.map((res) => (
@@ -299,7 +299,7 @@ const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
                                 </div>
                               </div>
 
-                              <AnswerForm handleUpdate={handleUpdateInfo} workId={post.work} data={post.answer} update={true}/>
+                              <AnswerForm handleAnswerClose={()=> setShowAnswerModal(false)} handleUpdate={handleUpdateInfo} work={post.work} data={post.answer} update={true}/>
 
                               <div className="modal-footer course">
                                 <button className="secondary-button course" onClick={handleAnswerClose}>

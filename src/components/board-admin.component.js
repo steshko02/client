@@ -28,7 +28,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import { Stack } from "@mui/material";
 
-let PageSize = 6;
+let PageSize = 10;
 export default function BoardAdmin() {
  
   const token = AuthService.getCurrentJwt()
@@ -41,7 +41,12 @@ export default function BoardAdmin() {
 });
 const [post, setPost] = useState([]);
 const [addLesson, setaddLesson] = useState(0);
-const [filter, setFilter] = useState('ALL');
+const [status, setStatus] = useState('');
+const [filter, setfilter] = useState({
+  user: '',
+  course: ''
+});
+const [findOn, setFindOn] = useState(false);
 
 const config = {
   headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
@@ -51,13 +56,34 @@ const handleUpdate = (obj) => {
   setaddLesson(addLesson+obj);
 };
 
+const handleChange = (e) => {
+  const value = e.target.value;
+  setfilter({
+    ...filter,
+    [e.target.name]: value
+  });
+};
+
   useEffect(() => {
+    let param; 
+  //   if(!findOn){
+  //     param = {
+  //     "number": pagination.currentPage-1,
+  //     "size": PageSize,
+  //     "status": status,
+  //   }
+  // } else {
+    param = {
+      "number": pagination.currentPage-1,
+      "size": PageSize,
+      "status": status,
+      "user" : filter.user,
+      "course" : filter.course
+    }
+  // }
     axios.get("http://localhost:8080/bookings/all/",
     {
-      params: {
-        "number": pagination.currentPage-1,
-        "size": PageSize
-      },
+      params: param,
       headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
     },
 
@@ -71,7 +97,7 @@ const handleUpdate = (obj) => {
       setaddLesson(response.data.totalCount);
     });
   },  
-[pagination.currentPage, addLesson,filter]);
+[pagination.currentPage, addLesson, status, filter]);
 
     return (
       <div className="container">
@@ -80,9 +106,13 @@ const handleUpdate = (obj) => {
         <br/>
       <Tabs>
       <TabList>
-        <Tab>Заявки на курсы</Tab>
-        <Tab>Список пользователей</Tab>
+        <Tab onClick={() => setStatus('CONSIDERED')}>Новые</Tab>
+        <Tab onClick={() => setStatus('APPROWED')}>Подтвежденные</Tab>
+        <Tab onClick={() => setStatus('CANCELLED')}>Отклоненные</Tab>
       </TabList>
+      <span> Пользователь  </span><input name="user" onChange={handleChange}></input>
+      <span> Курс </span><input name="course" onChange={handleChange}></input>
+      {/* <Button onClick={() => findOn(true)}>Поиск</Button> */}
       <TabPanel>
          <CollapsibleTable data = {post} handleUpdate={handleUpdate}/>
          <Pagination
@@ -95,6 +125,26 @@ const handleUpdate = (obj) => {
           currentPage: page })} />
       </TabPanel>
       <TabPanel>
+      <CollapsibleTable data = {post} handleUpdate={handleUpdate}/>
+         <Pagination
+        className="pagination-bar fixed"
+        currentPage= {pagination.currentPage}
+        totalCount= {pagination?.totalCount}
+        pageSize= {PageSize}
+        onPageChange={page => setPagination({
+            ...pagination,
+          currentPage: page })} />
+      </TabPanel>
+      <TabPanel>
+      <CollapsibleTable data = {post} handleUpdate={handleUpdate}/>
+         <Pagination
+        className="pagination-bar fixed"
+        currentPage= {pagination.currentPage}
+        totalCount= {pagination?.totalCount}
+        pageSize= {PageSize}
+        onPageChange={page => setPagination({
+            ...pagination,
+          currentPage: page })} />
       </TabPanel>
     </Tabs>
     </div>

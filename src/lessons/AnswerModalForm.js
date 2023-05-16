@@ -14,7 +14,7 @@ import Player from "../components/Player";
 import Helper from "../services/Helper"
 
 const API_URL = "http://localhost:8080/";
-export default function AnswerForm({handleUpdate, work, data, update}){
+export default function AnswerForm({handleAnswerClose,handleUpdate, work, data, update}){
 
     const location = useLocation();
     const token = AuthService.getCurrentJwt()
@@ -56,11 +56,12 @@ export default function AnswerForm({handleUpdate, work, data, update}){
           });
       })
         .then((response) => {
-          handleUpdate(1);
           setFiles({
             ...files,
             message: response.data.message,
           });
+          handleUpdate(3);
+          handleAnswerClose();
           return UploadService.getFiles();
         })
         .then((files) => {

@@ -160,26 +160,27 @@ const handleUpdate = (obj) => {
                     </MDBCol>
                   </MDBRow>
                   <MDBRow className="mb-4">
-                    <MDBCol sm="2">
+                    <MDBCol sm="4">
                       <MDBCardText>Дедлайн</MDBCardText>
                     </MDBCol>
-                    <MDBCol sm="8">
+                    <MDBCol sm="7">
                       <MDBCardText className="text-muted">{Helper.dateByFormat(data.work.deadline)}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <MDBRow>
-                  <MDBCol sm="2">
+                  <MDBCol sm="4">
                       <MDBCardText>Описание:</MDBCardText>
                   </MDBCol>
                     <MDBCol>
-                      <MDBCardText className="text-muted mb-4">
+                      <MDBCardText className="text-muted mb-7">
                         <WithLinks text ={data.work.description}></WithLinks>                      
                         </MDBCardText>
                     </MDBCol>
-                
                   </MDBRow>
                   <MDBRow>
                   <MDBCol sm="9">
+                  <br/>
+
                       <MDBCardText>Прикрепленные файлы:</MDBCardText>
                   </MDBCol>
                   <>

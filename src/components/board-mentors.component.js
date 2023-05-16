@@ -40,7 +40,9 @@ export default function BoardMentors() {
 });
 const [post, setPost] = useState([]);
 const [addLesson, setaddLesson] = useState(0);
-const [filter, setFilter] = useState('ALL');
+const [filter, setfilter] = useState({
+  course: ''
+});
 
 const config = {
   headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
@@ -72,6 +74,14 @@ const handleUpdate = (obj) => {
     });
   },  
 [pagination.currentPage, addLesson,filter]);
+
+const handleChange = (e) => {
+  const value = e.target.value;
+  setfilter({
+    ...filter,
+    [e.target.name]: value
+  });
+};
 
     return (
       <div className="container">
