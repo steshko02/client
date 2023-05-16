@@ -21,7 +21,7 @@ import MainMenu from "./menu/MainMenu"
 import EventBus from "./common/EventBus";
 import CourseInfo from "./courses/CourseInfo";
 import Lessoninfo from "./lessons/LessonInfo"
-
+import UserProfile from "./components/UserProfile";
 
 class App extends Component {
   constructor(props) {
@@ -88,6 +88,7 @@ class App extends Component {
             <Route path="/course-info" element={<CourseInfo />} />
             <Route path="/lesson" element={<Lessoninfo />} />
             <Route path="/learn-process" element={<BoardUser />} />
+            <Route path="/profile" element={<UserProfile />} />
           </Routes>
            <AuthVerify logOut={this.logOut} />
 

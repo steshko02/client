@@ -75,16 +75,12 @@ SideMenu.defaultProps = {
     <>
      { showUserBoard && (
       <>
-      <MenuLink href="/">Главная</MenuLink>
       <MenuLink href="/courses">Курсы</MenuLink>
-      <MenuLink href="/profile">Профиль</MenuLink>
       </>
      )} 
      { showAdminBoard && (
       <>
-      <MenuLink href="/courses">Курсы</MenuLink>
       <MenuLink href="/admin">Заявки</MenuLink>
-      <MenuLink href="/profile">Профиль</MenuLink>
       <MenuLink href="/users">Пользователи</MenuLink>
       </>
      )} 
@@ -98,6 +94,10 @@ SideMenu.defaultProps = {
       <MenuLink href="/learn-process">Учебный процесс</MenuLink>
       </>
      )} 
+           <MenuLink href="/">Главная</MenuLink>
+           <MenuLink href="/courses">Курсы</MenuLink>
+           <MenuLink href="/profile">Профиль</MenuLink>
+
     </>
   ),
 };
