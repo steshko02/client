@@ -4,3 +4,16 @@
 .DURING{
     color: green;
 }
+
+.left-filter-button { 
+    left: 10px;
+position: relative;
+}
+
+.filter { 
+    left: 90px;
+position: relative;
+}
+.pad-left { 
+    padding-left: 90px;
+}

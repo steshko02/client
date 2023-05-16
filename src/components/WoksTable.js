@@ -34,6 +34,7 @@ export default function WorksTable({lessonId}) {
     };
 
     const [data, setdata] = useState('');
+    const [openFilter, setOpenFilter] = useState(false);
 
     const [addLesson, setaddLesson] = useState(0);
 
@@ -86,12 +87,25 @@ export default function WorksTable({lessonId}) {
 
     return (
       <>
-       <span> Пользователь </span><input name="user" onChange={handleChange}></input>
-       <span> Статус </span><select name="status" onChange={handleChange}>
-       <option value="All">Все</option>
-        <option value="DURING">В срок</option>
-        <option value="FINISHED">Просрочено</option>
-       </select>
+      <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpenFilter(!openFilter)}
+            className = "left-filter-button"
+          >   Поиск
+            {openFilter ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+          <Collapse in={openFilter} timeout="auto" unmountOnExit>
+           <div className="filter">
+           <span> Пользователь </span><input name="user" onChange={handleChange}></input>
+            <span> Статус </span><select name="status" onChange={handleChange}>
+            <option value="All">Все</option>
+              <option value="DURING">В срок</option>
+              <option value="FINISHED">Просрочено</option>
+            </select>
+           </div>
+           </Collapse>
+      
         <div className="scroll-605">
       <TableContainer component={Paper}>
             <Table aria-label="collapsible table">

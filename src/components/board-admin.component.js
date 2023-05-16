@@ -41,12 +41,12 @@ export default function BoardAdmin() {
 });
 const [post, setPost] = useState([]);
 const [addLesson, setaddLesson] = useState(0);
-const [status, setStatus] = useState('');
+const [status, setStatus] = useState('CONSIDERED');
 const [filter, setfilter] = useState({
   user: '',
   course: ''
 });
-const [findOn, setFindOn] = useState(false);
+const [openFilter, setOpenFilter] = useState(false);
 
 const config = {
   headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
@@ -66,13 +66,7 @@ const handleChange = (e) => {
 
   useEffect(() => {
     let param; 
-  //   if(!findOn){
-  //     param = {
-  //     "number": pagination.currentPage-1,
-  //     "size": PageSize,
-  //     "status": status,
-  //   }
-  // } else {
+
     param = {
       "number": pagination.currentPage-1,
       "size": PageSize,
@@ -80,7 +74,6 @@ const handleChange = (e) => {
       "user" : filter.user,
       "course" : filter.course
     }
-  // }
     axios.get("http://localhost:8080/bookings/all/",
     {
       params: param,
@@ -110,8 +103,20 @@ const handleChange = (e) => {
         <Tab onClick={() => setStatus('APPROWED')}>Подтвежденные</Tab>
         <Tab onClick={() => setStatus('CANCELLED')}>Отклоненные</Tab>
       </TabList>
-      <span> Пользователь  </span><input name="user" onChange={handleChange}></input>
-      <span> Курс </span><input name="course" onChange={handleChange}></input>
+      <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpenFilter(!openFilter)}
+            className = "left-filter-button"
+          >   Поиск
+            {openFilter ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+          <Collapse in={openFilter} timeout="auto" unmountOnExit>
+           <div className="filter">
+            <span> Пользователь  </span><input name="user" onChange={handleChange}></input>
+           <span className="pad-left"> Курс </span><input name="course" onChange={handleChange}></input>
+           </div>
+           </Collapse>
       {/* <Button onClick={() => findOn(true)}>Поиск</Button> */}
       <TabPanel>
          <CollapsibleTable data = {post} handleUpdate={handleUpdate}/>

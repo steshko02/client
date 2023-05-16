@@ -82,10 +82,10 @@ SideMenu.defaultProps = {
      )} 
      { showAdminBoard && (
       <>
-      <MenuLink href="/admin">Админитратор</MenuLink>
-      <MenuLink href="/users">Пользователи</MenuLink>
       <MenuLink href="/courses">Курсы</MenuLink>
+      <MenuLink href="/admin">Заявки</MenuLink>
       <MenuLink href="/profile">Профиль</MenuLink>
+      <MenuLink href="/users">Пользователи</MenuLink>
       </>
      )} 
           { showMentorBoard && (
