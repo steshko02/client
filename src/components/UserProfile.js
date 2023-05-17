@@ -17,6 +17,9 @@ export default function UserProfile() {
 
     const [show, setshow] = useState(false);
     const [update, setUpdate] = useState(0);
+    const [isChange, setIsChange] = useState(false);
+    const [state, setState] = useState({ disabled: true });
+    const [hasProfile, sethasProfile] = useState(false);
 
     const [files, setFiles] = useState({
         selectedFiles: undefined,
@@ -24,13 +27,14 @@ export default function UserProfile() {
     });
 
     const [profile, setProfile] = useState({ 
+        id: undefined,
         department: '',
         phoneNumber:  '',
         githubUrl: '',
         jobTitle: '',
         other : '',
         experience: '',
-        firstname: '',
+        firstname: '',  
         lastname:'',
         email:'',
         photoUrl: 'https://bootdey.com/img/Content/avatar/avatar7.png'
@@ -43,8 +47,18 @@ export default function UserProfile() {
           ...profile,
           [e.target.name]: value
         });
+        setIsChange(true);
       };
 
+      const handleShowButton = (e) => {
+        setState({disabled: false});
+      };
+
+      const handleChangeCansel = (e) => {
+        setState({disabled: true});
+        setIsChange(false);
+        setUpdate(update+1);
+      }
 
       const uploadPicture = () => {
         let currentFile = files.selectedFiles[0];
@@ -63,7 +77,7 @@ export default function UserProfile() {
     
         picture.append("picture", currentFile);
     
-        return http.post("http://localhost:8080/profile/avatar", picture, config).then(setUpdate(update+1));
+        return http.post("http://localhost:8080/profile/avatar", picture, config).then(setshow(false)).then(setUpdate(update+1));
       }
     
 
@@ -75,7 +89,7 @@ export default function UserProfile() {
         var FormData = require('form-data');
         var data = new FormData();
         var config = {
-          method: 'post',
+          method: !hasProfile? 'post' : 'put',
           url: API_URL + "profile",
           headers: { 
             'Authorization' : `Bearer ${token}`
@@ -89,10 +103,13 @@ export default function UserProfile() {
                 ...profile,
                 id: respId
               });
-              setUpdate(update+1)
+              setState({disabled: true});
+              setIsChange(false);
             },
           )
-              }
+          setUpdate(update+2)
+
+    }
     
 
     useEffect(() => {
@@ -103,6 +120,7 @@ export default function UserProfile() {
         ).then((response) => {
             setProfile({
                 ...profile,
+                id: response.data.id,
                 department: response.data.department,
                 phoneNumber: response.data.number,
                 githubUrl: response.data.githubUrl,
@@ -113,9 +131,11 @@ export default function UserProfile() {
                 email: response.data.email,
                 lastname: response.data.lastname,
                 jobTitle: response.data.jobTitle,
-                photoUrl: response.data.photoUrl
-
+                photoUrl: response.data.photoUrl!==null ?  response.data.photoUrl : 'https://bootdey.com/img/Content/avatar/avatar7.png'
               });
+              if(response.data.id!=null){
+              sethasProfile(true);
+              }
         });
       },  
     [update]);
@@ -177,25 +197,25 @@ export default function UserProfile() {
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="fullName">Имя</label>
-                                          <input disabled onChange={handleChange} value={profile.firstname} type="text" name="firstname" className="form-control" id="fullName" placeholder="Enter full name" />
+                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.firstname} type="text" name="firstname" className="form-control" id="fullName" placeholder="Enter full name" />
                                       </div>
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="fullName">Фамилия</label>
-                                          <input disabled onChange={handleChange} value={profile.lastname} type="text" name="lastname"  className="form-control" id="fullName" placeholder="Enter full name" />
+                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.lastname} type="text" name="lastname"  className="form-control" id="fullName" placeholder="Enter full name" />
                                       </div>
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="eMail">Email</label>
-                                          <input disabled onChange={handleChange} value={profile.email} type="email" name="email" className="form-control" id="eMail" placeholder="Enter email ID" />
+                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.email} type="email" name="email" className="form-control" id="eMail" placeholder="Enter email ID" />
                                       </div>
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="phone">Телефон</label>
-                                          <input disabled onChange={handleChange} value={profile.phoneNumber} type="text" name="phoneNumber"  className="form-control" id="phone" placeholder="Enter phone number" />
+                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.phoneNumber} type="text" name="phoneNumber"  className="form-control" id="phone" placeholder="Enter phone number" />
                                       </div>    
                                   </div>
                               </div>
@@ -206,25 +226,25 @@ export default function UserProfile() {
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="website">GitHub URL</label>
-                                          <input disabled onChange={handleChange} value={profile.githubUrl} type="url" name="githubUrl"  className="form-control" id="website" placeholder="Website url" />
+                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.githubUrl} type="url" name="githubUrl"  className="form-control" id="website" placeholder="Website url" />
                                       </div>
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="Street">Должность</label>
-                                          <input disabled onChange={handleChange} value={profile.jobTitle} type="name" name="jobTitle"  className="form-control" id="Street" placeholder="Enter Street" />
+                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.jobTitle} type="name" name="jobTitle"  className="form-control" id="Street" placeholder="Enter Street" />
                                       </div>
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="ciTy">Департамент</label>
-                                          <input disabled onChange={handleChange} value={profile.department}  type="name" name="department"  className="form-control" id="ciTy" placeholder="Enter City" />
+                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.department}  type="name" name="department"  className="form-control" id="ciTy" placeholder="Enter City" />
                                       </div>
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="sTate">Опыт</label>
-                                          <input disabled onChange={handleChange} value={profile.experience} type="text" name="experience" className="form-control" id="sTate" placeholder="Enter State" />
+                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.experience} type="text" name="experience" className="form-control" id="sTate" placeholder="Enter State" />
                                       </div>
                                   </div>  
                               </div>
@@ -234,18 +254,21 @@ export default function UserProfile() {
                                   </div>
                                   <div className="col-xl-12 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
-                                          <textarea disabled onChange={handleChange} value={profile.other} type="text" name="other" className="form-control" id="fullName" placeholder="Enter full name" />
+                                          <textarea disabled = {state.disabled} onChange={handleChange} value={profile.other} type="text" name="other" className="form-control" id="fullName" placeholder="Enter full name" />
                                       </div>
                                   </div>
                                 </div>
                               <div className="row gutters">
                                   <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                       <div className="text-left">
-                                          <button onClick={postProfile} type="button" id="submit" name="submit" className="btn btn-primary">Update</button>
-                                          <span>   </span>
-                                          <button type="button" id="submit" name="submit" className="btn btn-primary">Save</button>
-                                          <span>   </span>
-                                          <button type="button" id="submit" name="submit" className="btn btn-secondary">Cancel</button>
+                                        {!isChange && 
+                                          <><button onClick={handleShowButton}  type="button" id="submit" name="submit" className="btn btn-primary">Изменить</button>
+                                          <span>   </span></>
+                                        }
+                                         {isChange && 
+                                          <><button onClick={postProfile} type="button" id="submit" name="submit" className="btn btn-primary">Сохранить</button><span>   </span></>
+                                         }
+                                          <button onClick={handleChangeCansel} type="button" id="submit" name="submit" className="btn btn-secondary">Отменить</button>
                                       </div>
                                   </div>
                               </div>
