@@ -14,7 +14,7 @@ import Player from "../components/Player";
 import Helper from "../services/Helper"
 
 const API_URL = "http://localhost:8080/";
-export default function AnswerForm({handleAnswerClose,handleUpdate, work, data, update}){
+export default function AnswerForm({handleAnswerClose, handleUpdate, work, data, update}){
 
     const location = useLocation();
     const token = AuthService.getCurrentJwt()

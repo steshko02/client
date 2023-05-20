@@ -26,6 +26,14 @@ import MenuList from '@mui/material/MenuList';
 import { Stack } from "@mui/material";
 import Modal from "react-overlays/Modal";
 import WorksTable from "./WoksTable";
+import WorkForm from "./WorkForm"
+import LessonForm from './LessonForm';
+import '@mobiscroll/react/dist/css/mobiscroll.min.css';
+import {
+  MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardText, MDBCardBody,
+} from 'mdb-react-ui-kit';
+import { Input, Page, setOptions,Textarea,Datepicker } from '@mobiscroll/react';
+import '@mobiscroll/react/dist/css/mobiscroll.min.css';
 
 
 let PageSize = 3;
@@ -91,7 +99,6 @@ const handleChange = (e) => {
       <Tabs>
       <TabList>
         <Tab>Ваши занятия</Tab>
-        <Tab>Список пользователей</Tab>
       </TabList>
       <TabPanel>
          <CollapsibleTable data = {post} handleUpdate={handleUpdate}/>
@@ -161,7 +168,7 @@ function Row({rowData, handleUpdate}) {
                    <TableCell>{item.mentors?.map((item) => (
                     <><a href="#">{item.firstname} {item.lastname}</a><br /></>
                   ))}</TableCell>
-                    <TableCell><div><MenuListComposition id={rowData.id} lessId ={item.id} handleUpdate ={handleUpdate}/></div></TableCell>
+                    <TableCell><div><MenuListComposition courseId={rowData.id} id={rowData.id} lessId ={item.id} handleUpdate ={handleUpdate}/></div></TableCell>
                  </TableRow>  
                   ))}
                   
@@ -203,14 +210,15 @@ function Row({rowData, handleUpdate}) {
 
 const API_URL = "http://localhost:8080/";
 
- function MenuListComposition({lessId, handleUpdate}) {
+ function MenuListComposition({courseId,lessId, handleUpdate}) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
 
   const token = AuthService.getCurrentJwt()
   const [showModal, setShowModal] = useState(false);
-
+  const [showWorkModal, setshowWorkModal] = useState(false);
   const [selectLesson, setSelectLesson] = useState(0);
+  const [showLessonModal, setshowLessonModal] = useState(false);
 
 
   console.log(lessId);
@@ -223,26 +231,7 @@ const API_URL = "http://localhost:8080/";
   };
 
   const canceled = () =>{
-    var axios = require('axios');
-    var FormData = require('form-data');
-    var data = new FormData();
-
-    var config = {
-      method: 'post',
-      url: 'http://localhost:8080/bookings/canceled/'+lessId,
-      headers: { 
-        'Authorization' : `Bearer ${token}`
-      },
-      data : data
-    };
-    axios(config)
-    .then(function (response) {
-      console.log(JSON.stringify(response.data));
-      handleUpdate();
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+    setshowWorkModal(true);
   }
 
   const handleToggle = () => {
@@ -291,7 +280,7 @@ const API_URL = "http://localhost:8080/";
       onHide={() => setShowModal(false)}
       renderBackdrop={renderBackdrop}
     >
-      <div>
+      <div className='scroll' >
         <div className="modal-header modal-header">
           <div className="modal-title modal-title">Modal Heading</div>
           <div>
@@ -301,6 +290,46 @@ const API_URL = "http://localhost:8080/";
           </div>
         </div>
         <WorksTable lessonId ={lessId} />
+      </div>
+  
+    </Modal>
+
+      <Modal
+      className="modal"
+      show={showWorkModal}
+      onHide={() => setshowWorkModal(false)}
+      renderBackdrop={renderBackdrop}
+    >
+      <div className='scroll' >
+        <div className="modal-header modal-header">
+          <div className="modal-title modal-title">Форма задания</div>
+          <div>
+            <span className="close-button course" onClick={() => setshowWorkModal(false)}>
+              x
+            </span>
+          </div>
+        </div>
+        <WorkForm courseId= {courseId} handleClose ={() => setshowWorkModal(false)} lessId ={lessId} />
+      </div>
+  
+    </Modal>
+
+    <Modal
+      className="modal"
+      show={showLessonModal}
+      onHide={() => setshowLessonModal(false)}
+      renderBackdrop={renderBackdrop}
+    >
+      <div className='scroll' >
+        <div className="modal-header modal-header">
+          <div className="modal-title modal-title">Форма занятия</div>
+          <div>
+            <span className="close-button course" onClick={() => setshowLessonModal(false)}>
+              x
+            </span>
+          </div>
+        </div>
+        <LessonForm  courseId= {courseId} handleClose ={() => setshowLessonModal(false)} handleUpdate={handleUpdate} lessonId ={lessId} />
       </div>
   
     </Modal>
@@ -341,7 +370,7 @@ const API_URL = "http://localhost:8080/";
                       onKeyDown={handleListKeyDown}
                     >
                       <MenuItem onClick={() => setShowModal(true)}>Выполненные работы</MenuItem>
-                      <MenuItem onClick={canceled}>Изменить занятие</MenuItem>
+                      <MenuItem onClick={() => setshowLessonModal(true)}>Изменить занятие</MenuItem>
                       <MenuItem onClick={canceled}>Изменить задание</MenuItem>
                     </MenuList>
                   </ClickAwayListener>

@@ -25,9 +25,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import { Stack } from "@mui/material";
 import Modal from "react-overlays/Modal";
-import WorksTable from "./WoksTable";
-import {Dropdown, Input, Page, setOptions,Textarea,Datepicker,Stepper, Select, Checkbox } from '@mobiscroll/react';
-import Form from "react-validation/build/form";
+
 import AnswerForm from '../lessons/AnswerModalForm'
 import "./status.css"
 
@@ -270,7 +268,7 @@ const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
                         <>
                         <span><b>Ваша работа</b></span><br/>
                         <span><b>Сдано: </b></span><span>{Helper.dateByFormat(post.answer.date)}</span><br/>
-                        <span><b>Статус:</b> </span><span>{Helper.statusByFormatForTask(post.answer.timeStatus)}</span><br/>
+                        <span><b>Статус:</b> </span><span className={post.answer.timeStatus}>{Helper.statusByFormatForTask(post.answer.timeStatus)}</span><br/>
                         <>
                           <span><b>Описание: </b></span><span><WithLinks text={post.answer.comment} /> </span><br />
                           <span><b>Прикрепленные файлы:</b></span><br />
