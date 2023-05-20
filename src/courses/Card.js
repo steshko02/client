@@ -181,7 +181,7 @@ function Card(props) {
       </div>
       <button className="card_c__btn" id={props.id} 
       onClick= {() => {redirectCourse(props.id,props.img)}}
-      >View</button>
+      >Подробнее</button>
     </div>
   );
 }

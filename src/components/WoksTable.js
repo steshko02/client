@@ -20,9 +20,13 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Helper from "../services/Helper"
 import Paper from '@mui/material/Paper';
-import { Button, Dropdown, Input, Page, setOptions,Textarea,Datepicker,Stepper, Select, Checkbox } from '@mobiscroll/react';
 import Form from "react-validation/build/form";
 import "./status.css"
+import {
+  MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardText, MDBCardBody, MDBCardImage, MDBBtn, MDBBreadcrumb, MDBBreadcrumbItem, MDBProgress, MDBProgressBar, MDBIcon,MDBListGroup,MDBListGroupItem, MDBCardLink
+} from 'mdb-react-ui-kit';
+import { Button, Dropdown, Input, Page, setOptions,Textarea,Datepicker,Stepper, Select, Checkbox } from '@mobiscroll/react';
+import '@mobiscroll/react/dist/css/mobiscroll.min.css';
 const API_URL = "http://localhost:8080/";
 
 let PageSize = 10;
@@ -208,7 +212,7 @@ export default function WorksTable({lessonId}) {
         </TableCell>
         <TableCell><a href="#">{rowData.user.firstname} {rowData.user.lastname}</a></TableCell>
           <TableCell><b><span className={rowData.timeStatus}>{Helper.statusByFormatForTask(rowData.timeStatus)}</span></b></TableCell>
-          <TableCell>Название задания</TableCell>
+          <TableCell>{rowData.workTitle}</TableCell>
           <TableCell>{Helper.dateByFormat(rowData.date)}</TableCell>
           <TableCell><b>{rowData.result &&  rowData.result.mark}</b></TableCell>
         </TableRow>

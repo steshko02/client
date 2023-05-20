@@ -3,9 +3,9 @@ import AuthService from "../services/auth.service";
 import React, { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
 import {
-  MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardText, MDBCardBody, MDBCardImage, MDBBtn, MDBBreadcrumb, MDBBreadcrumbItem, MDBProgress, MDBProgressBar, MDBIcon,MDBListGroup,MDBListGroupItem, MDBCardLink
+  MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardText, MDBCardBody,
 } from 'mdb-react-ui-kit';
-import { Button, Dropdown, Input, Page, setOptions,Textarea,Datepicker,Stepper, Select, Checkbox } from '@mobiscroll/react';
+import { Button, Input, Page, setOptions,Textarea,Datepicker } from '@mobiscroll/react';
 import '@mobiscroll/react/dist/css/mobiscroll.min.css';
 import Form from "react-validation/build/form";
 import Modal from "react-overlays/Modal";
@@ -13,6 +13,8 @@ import UploadService from "../services/UploadService";
 import Player from "../components/Player";
 import Helper from "../services/Helper"
 import AnswerForm from "./AnswerModalForm"
+import LessonForm from "../components/LessonForm";
+import WorkForm from "../components/WorkForm";
 
 const API_URL = "http://localhost:8080/";
 
@@ -31,7 +33,8 @@ function LessonInfo() {
     const [showModal, setShowModal] = useState(false);
     const [showAnswerModal, setShowAnswerModal] = useState(false);
     const [isAdminOrMentor, setIsAdminOrMentor] = useState(false);
-
+    const [showWorkModal, setshowWorkModal] = useState(false);
+    const [showLessonModal, setshowLessonModal] = useState(false);
   
     const [addWork, setaddWork] = useState(0);
     const config = {
@@ -101,7 +104,7 @@ const handleUpdate = (obj) => {
             </div>
           </div>
 
-          <WorkForm handleUpdate={handleUpdate}/>
+          <WorkFormLocal handleUpdate={handleUpdate}/>
 
           <div className="modal-footer course">
             <button className="secondary-button course" onClick={handleClose}>
@@ -131,14 +134,58 @@ const handleUpdate = (obj) => {
 
           <div className="modal-footer course">
             <button className="secondary-button course" onClick={handleAnswerClose}>
-              Close
+              Закрыть
             </button>
           </div>
         </div>
       </Modal>
 
+      <Modal
+      className="modal"
+      show={showWorkModal}
+      onHide={() => setshowWorkModal(false)}
+      renderBackdrop={renderBackdrop}
+    >
+      <div className='scroll' >
+        <div className="modal-header modal-header">
+          <div className="modal-title modal-title">Форма задания</div>
+          <div>
+            <span className="close-button course" onClick={() => setshowWorkModal(false)}>
+              x
+            </span>
+          </div>
+        </div>
+        <WorkForm 
+        courseId= {data.courseId}
+         handleClose ={() => setshowWorkModal(false)} lessId ={data.id} />
+      </div>
+  
+    </Modal>
+
+    <Modal
+      className="modal"
+      show={showLessonModal}
+      onHide={() => setshowLessonModal(false)}
+      renderBackdrop={renderBackdrop}
+    >
+      <div className='scroll' >
+        <div className="modal-header modal-header">
+          <div className="modal-title modal-title">Форма занятия</div>
+          <div>
+            <span className="close-button course" onClick={() => setshowLessonModal(false)}>
+              x
+            </span>
+          </div>
+        </div>
+        <LessonForm 
+         courseId= {data.courseId}
+          handleClose ={() => setshowLessonModal(false)} handleUpdate={handleUpdate} lessonId ={data.id} />
+      </div>
+  
+    </Modal>
+
         <MDBContainer className="py-5">
-          <MDBRow>
+          <MDBRow  className="mb-4">
             <MDBCol lg="6">
               <MDBCard className="mb-4">
                   <Player 
@@ -249,7 +296,7 @@ const handleUpdate = (obj) => {
               </MDBCard>
                 
             </MDBCol>
-            <MDBCol lg="6">
+            <MDBCol lg="6" >
               <MDBCard className="mb-4">
                 <MDBCardBody>
                   <MDBRow>
@@ -311,32 +358,17 @@ const handleUpdate = (obj) => {
           </MDBRow>
           <MDBRow>
                 <MDBCol md="6">
-                  <MDBCard className="mb-4 mb-md-0">
-                    <MDBCardBody>
-                      <MDBCardText className="mb-4"><span className="text-primary font-italic me-1">Функции администратора</span>  </MDBCardText>
-                      <button onClick={() => deleteWork(data.work.id)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                        Удалить задание
-                      </button>
-                      <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                        Изменить задание
-                      </button>
-                      <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                      </button>
-                    </MDBCardBody>
-                  </MDBCard>
-                </MDBCol>
-                <MDBCol md="6">
-                  <MDBCard className="mb-4 mb-md-0">
+                  <MDBCard className="mb-4 mb-md-4">
                     <MDBCardBody>
                       <MDBCardText className="mb-4"><span className="text-primary font-italic me-1">Функции ментора</span>  </MDBCardText>
-                      <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                        Изменить описание
-                      </button>
-                      <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                        Назначить ментора
-                      </button>
-                      <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                      </button>
+                      <><button onClick={() => setshowLessonModal(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
+                      Изменить занятие
+                    </button><br /></>
+                      { data.work && (
+                      <><button  onClick={() => setshowWorkModal(true)}  type="button" class="btn btn-link" data-mdb-ripple-color="dark">
+                      Изменить задание к занятию
+                    </button></>
+                      )}
                     </MDBCardBody>
                   </MDBCard>
                 </MDBCol>
@@ -348,7 +380,7 @@ const handleUpdate = (obj) => {
 
 export default LessonInfo;
 
-function WorkForm({handleUpdate}){
+function WorkFormLocal({handleUpdate}){
 
   const location = useLocation();
   const token = AuthService.getCurrentJwt()

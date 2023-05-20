@@ -75,7 +75,6 @@ SideMenu.defaultProps = {
     <>
      { showUserBoard && (
       <>
-      <MenuLink href="/courses">Курсы</MenuLink>
       </>
      )} 
      { showAdminBoard && (

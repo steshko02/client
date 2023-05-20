@@ -18,6 +18,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { Button, ButtonGroup, ButtonToolbar } from '@trendmicro/react-buttons';
 import '@trendmicro/react-buttons/dist/react-buttons.css';
+import { Link } from "react-router-dom";
 
 const API_URL = "http://localhost:8080/";
 
@@ -253,11 +254,6 @@ const getUsers = (id) => {
   return response;
 }
 
-// const onFilter = React.useCallback((ev) => {
-//   remoteFiltering(ev.filterText);
-//   return false;
-// }, [remoteFiltering]);
-
   return(
       <Page >
             <div className="mbsc-grid mbsc-grid-fixed scroll">
@@ -267,7 +263,7 @@ const getUsers = (id) => {
                       >
                     <div className="mbsc-row mbsc-justify-content-center">
                         <div className="mbsc-col-md-10 mbsc-col-xl-8 mbsc-form-grid">
-                            <div className="mbsc-form-group-title">New lesson form</div>
+                            <div className="mbsc-form-group-title">Форма создания занятия</div>
                             <div className="mbsc-row">
                               <input hidden type="text "></input>
                                 <div className="mbsc-col-md-12 mbsc-col-12">
@@ -526,8 +522,8 @@ const handleUpdate = (obj) => {
                             return (
                           <MDBListGroupItem className="d-flex  align-items-center p-3 first_block">
                             <MDBIcon fas icon="globe fa-lg text-warning" />
-                            <a class="sidenav-link" onClick= {() => {redirectLesson(items.id)}}><span>Занятие - {index+1}</span> {items.title}</a>
-                            <Button className="second_block" id={items.id}  startIcon="ion-close-circled" onClick={deleteLesson} >Удалить</Button>
+                            <a class="sidenav-link" onClick= {() => {redirectLesson(items.id)}} ><span> Занятие: </span> {items.title} </a>
+                            <Button  className="second_block ml-2" id={items.id}  startIcon="ion-close-circled" onClick={deleteLesson} >Удалить</Button>
                           </MDBListGroupItem>
                             )
                         })}  
@@ -539,8 +535,8 @@ const handleUpdate = (obj) => {
                             return (
                           <MDBListGroupItem className="d-flex  align-items-center p-3 first_block">
                             <MDBIcon fas icon="globe fa-lg text-warning" />
-                            <a class="sidenav-link" onClick= {() => {redirectLesson(items.id)}}><span>Занятие - {index+1}</span> {items.title}</a>
-                            <Button className="second_block" id={items.id}  startIcon="ion-close-circled" onClick={deleteLesson} >Удалить</Button>
+                            <a class="sidenav-link" onClick= {() => {redirectLesson(items.id)}}><span>Занятие: </span> {items.title}</a>
+                            <Button className="second_block  ml-2" id={items.id}  startIcon="ion-close-circled" onClick={deleteLesson} >Удалить</Button>
                           </MDBListGroupItem>
                             )
                         })}  
@@ -552,8 +548,8 @@ const handleUpdate = (obj) => {
                             return (
                           <MDBListGroupItem className="d-flex  align-items-center p-3 first_block">
                             <MDBIcon fas icon="globe fa-lg text-warning" />
-                            <a class="sidenav-link" onClick= {() => {redirectLesson(items.id)}}><span>Занятие - {index+1}</span> {items.title}</a>
-                            <Button className="second_block" id={items.id}  startIcon="ion-close-circled" onClick={deleteLesson} >Удалить</Button>
+                            <a class="sidenav-link" onClick= {() => {redirectLesson(items.id)}}><span>Занятие: </span> {items.title}</a>
+                            <Button className="second_block  ml-2" id={items.id}  startIcon="ion-close-circled" onClick={deleteLesson} >Удалить</Button>
                           </MDBListGroupItem>
                             )
                         })}  
@@ -609,15 +605,6 @@ const handleUpdate = (obj) => {
                   <hr />
                   <MDBRow>
                     <MDBCol sm="4">
-                      <MDBCardText>Технологии</MDBCardText>
-                    </MDBCol>
-                    <MDBCol sm="8">
-                      <MDBCardText className="text-muted">Bay Area, San Francisco, CA</MDBCardText>
-                    </MDBCol>
-                  </MDBRow>
-                  <hr />
-                  <MDBRow>
-                    <MDBCol sm="4">
                       <MDBCardText>Описание</MDBCardText>
                     </MDBCol>
                     <MDBCol sm="8">
@@ -631,38 +618,24 @@ const handleUpdate = (obj) => {
                     </MDBCol>
                     <MDBCol sm="8">
                       <MDBCardText className="text-muted">{data.mentors?.map((items) => {
-                                   return <><a href="#" id={items.id}>{items.firstname} {items.lastname}</a><br /></>;
+                                   return <><Link to="/user" state={{ id: items.uuid }}>{items.firstname} {items.lastname}</Link><br /></>;
                               })}
                          </MDBCardText>
                     </MDBCol>
                   </MDBRow>
                 </MDBCardBody>
               </MDBCard>
+              {showAdminBoard &&
               <MDBRow>
-                <MDBCol md="6">
+                <MDBCol md="12">
                   <MDBCard className="mb-4 mb-md-0">
                     <MDBCardBody>
                       <MDBCardText className="mb-4"><span className="text-primary font-italic me-1">Функции администратора</span>  </MDBCardText>
                       <button onClick={() => deleteCourse(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
                         Удалить курс
-                      </button>
+                      </button><br/>
                       <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                        Назначить ментора
-                      </button>
-                      <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                      </button>
-                    </MDBCardBody>
-                  </MDBCard>
-                </MDBCol>
-                <MDBCol md="6">
-                  <MDBCard className="mb-4 mb-md-0">
-                    <MDBCardBody>
-                      <MDBCardText className="mb-4"><span className="text-primary font-italic me-1">Функции ментора</span>  </MDBCardText>
-                      <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                        Изменить описание
-                      </button>
-                      <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
-                        Назначить ментора
+                        Редактировать информацию о курсе
                       </button>
                       <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
                       </button>
@@ -670,6 +643,7 @@ const handleUpdate = (obj) => {
                   </MDBCard>
                 </MDBCol>
               </MDBRow>
+              }
             </MDBCol>
           </MDBRow>
         </MDBContainer>

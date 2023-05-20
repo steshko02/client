@@ -22,7 +22,7 @@ import EventBus from "./common/EventBus";
 import CourseInfo from "./courses/CourseInfo";
 import Lessoninfo from "./lessons/LessonInfo"
 import UserProfile from "./components/UserProfile";
-
+import UserPage from "./components/OtherUserPage";
 class App extends Component {
   constructor(props) {
     super(props);
@@ -89,6 +89,7 @@ class App extends Component {
             <Route path="/lesson" element={<Lessoninfo />} />
             <Route path="/learn-process" element={<BoardUser />} />
             <Route path="/profile" element={<UserProfile />} />
+            <Route path="/user" element={<UserPage />} />
           </Routes>
            <AuthVerify logOut={this.logOut} />
 
