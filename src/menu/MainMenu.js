@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Login from "../components/login.component";
 import {  useLocation } from 'react-router-dom';
-
+import './logo.css';
 
 const Navbar = styled.div`
   display: flex;
@@ -34,6 +34,8 @@ const Navbar = styled.div`
   box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 16px;
   z-index: 500;
 `;
+
+
  //  padding: 6px 60px;
 
 const MainMenu = () => {
@@ -83,16 +85,15 @@ const MainMenu = () => {
 
      {currentUser ? (
            <><><HamburgerButton /><div>
-            <h1>Senla Courses</h1>
+            <h1 className='logo'>Senla Courses</h1>
           </div></>
           <div className="goLeft"><Link to={"/logout"} onClick={logOut} className="nav-link">
-              LogOut
+              Выйти
             </Link>
             </div>
             </> 
           ) : (
-          <><h1>Senla Courses</h1><div>
-            </div></>
+          <></>
           )} 
       </Navbar>
       <SideMenu />

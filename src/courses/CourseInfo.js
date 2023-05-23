@@ -19,6 +19,7 @@ import 'react-tabs/style/react-tabs.css';
 import { Button, ButtonGroup, ButtonToolbar } from '@trendmicro/react-buttons';
 import '@trendmicro/react-buttons/dist/react-buttons.css';
 import { Link } from "react-router-dom";
+import CourseForm from "./CourceForm";
 
 const API_URL = "http://localhost:8080/";
 
@@ -349,7 +350,8 @@ const getUsers = (id) => {
     const location = useLocation();
  
     const [showModal, setShowModal] = useState(false);
-  
+    const [showModalCourse, setshowModalCourse] = useState(false);
+
     const [addLesson, setaddLesson] = useState(0);
     const [lessArray, setLessArray] = useState([]);
     const [book, setBook] = useState(false);
@@ -389,7 +391,6 @@ setOptions({
 
 const handleUpdate = (obj) => {
   setaddLesson(addLesson+obj);
-  handleClose();
 };
 
   var handleClose = () => setShowModal(false);
@@ -473,7 +474,7 @@ const handleUpdate = (obj) => {
       >
         <div>
           <div className="modal-header modal-header">
-            <div className="modal-title modal-title">Modal Heading</div>
+            <div className="modal-title modal-title">Форма занятия</div>
             <div>
               <span className="close-button course" onClick={handleClose}>
                 x
@@ -485,6 +486,25 @@ const handleUpdate = (obj) => {
         </div>
       </Modal>
 
+      <Modal
+        className="modal customcourse"
+        show={showModalCourse}
+        onHide={()=>setshowModalCourse(false)}
+        renderBackdrop={renderBackdrop}
+      >
+        <div>
+          <div className="modal-header modal-header">
+            <div className="modal-title modal-title">Форма курса</div>
+            <div>
+              <span className="close-button course" onClick={()=>setshowModalCourse(false)}>
+                x
+              </span>
+            </div>
+          </div>
+
+          <CourseForm handleUpdate={handleUpdate} handleClose={()=>setshowModalCourse(false)} courseId ={location.state.itemId}/>
+        </div>
+      </Modal>
         <MDBContainer className="py-5">
           <MDBRow>
             <MDBCol lg="4">
@@ -634,7 +654,7 @@ const handleUpdate = (obj) => {
                       <button onClick={() => deleteCourse(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
                         Удалить курс
                       </button><br/>
-                      <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">
+                      <button onClick={()=>setshowModalCourse(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
                         Редактировать информацию о курсе
                       </button>
                       <button type="button" class="btn btn-link" data-mdb-ripple-color="dark">

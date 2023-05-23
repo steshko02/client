@@ -87,3 +87,22 @@ a:hover div img{
     opacity: 0.6; /* Высветляем картинку, но она становится темнее, так как под ней черный фон */
     transform: scale(1.05); /* Увеличение картинки */
 }
+
+.course-setting .user-profile .user-avatar img {
+    width: 220px;
+    height: 150px;
+    /* -webkit-border-radius: 50px;
+    -moz-border-radius: 50px;
+    border-radius: 50px; */
+}
+
+.center {
+    position: relative;
+    left: 5%;
+}
+
+.butt_save {
+    position: absolute;
+    left: 260px;
+    top: 63px;
+}

@@ -28,13 +28,8 @@ import Modal from "react-overlays/Modal";
 import WorksTable from "./WoksTable";
 import WorkForm from "./WorkForm"
 import LessonForm from './LessonForm';
+import {Input, Page, setOptions,Textarea,Datepicker } from '@mobiscroll/react';
 import '@mobiscroll/react/dist/css/mobiscroll.min.css';
-import {
-  MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardText, MDBCardBody,
-} from 'mdb-react-ui-kit';
-import { Input, Page, setOptions,Textarea,Datepicker } from '@mobiscroll/react';
-import '@mobiscroll/react/dist/css/mobiscroll.min.css';
-
 
 let PageSize = 3;
 export default function BoardMentors() {

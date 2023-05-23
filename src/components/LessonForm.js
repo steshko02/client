@@ -9,6 +9,7 @@ import 'react-tabs/style/react-tabs.css';
 import { Button, ButtonGroup, ButtonToolbar } from '@trendmicro/react-buttons';
 import '@trendmicro/react-buttons/dist/react-buttons.css';
 import { Dropdown, Input, Page, setOptions,Textarea,Datepicker,Stepper, Select, Checkbox } from '@mobiscroll/react';
+import '@mobiscroll/react/dist/css/mobiscroll.min.css';
 
 const API_URL = "http://localhost:8080/";
 

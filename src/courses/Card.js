@@ -366,15 +366,6 @@ const selectedChange = (ev) => {
                                     filter = {true}
                                     onFilter={userFilter}
                                 />  
-                          {/* <Select
-                            data={users}
-                            display="anchored"
-                            filter={true}
-                            label="Remote data"
-                            inputStyle="box"
-                            onFilter={userFilter}
-                            onChange={selectedChange}
-                        /> */}
                                 </div>
                                 <div className="mbsc-col-md-12 mbsc-col-10">
                                 <Textarea name="description" inputStyle="box" 

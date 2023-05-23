@@ -10,7 +10,6 @@ import UploadService from "../services/UploadService";
 const API_URL = "http://localhost:8080/";
  export default function WorkForm({ handleClose, lessId, courseId}){
 
-    const location = useLocation();
     const token = AuthService.getCurrentJwt()
     const config = {
         headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
@@ -27,7 +26,6 @@ const API_URL = "http://localhost:8080/";
   
     const [res, setRes] = React.useState([]);
     const [workUpdate, setWorkUpdate] = React.useState(0);
-
 
     useEffect(() => {
         axios.get("http://localhost:8080/works/byLesson/"+lessId,
@@ -217,16 +215,4 @@ const API_URL = "http://localhost:8080/";
               </div>
           </Page>
     );
-  }
-  
-  
-  function WithLinks({text}) {
-  
-      var res = []
-      
-      text && text.replace(/((?:https?:\/\/|ftps?:\/\/|\bwww\.)(?:(?![.,?!;:()]*(?:\s|$))[^\s]){2,})|(\n+|(?:(?!(?:https?:\/\/|ftp:\/\/|\bwww\.)(?:(?![.,?!;:()]*(?:\s|$))[^\s]){2,}).)+)/gim, (m, link, text) => {
-        res.push(link ? <a href={(link[0]==="w" ? "//" : "") + link} key={res.length}>{link}</a> : text)
-      })
-  
-      return <div className="user-text">{res}</div>
   }
