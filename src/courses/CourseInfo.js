@@ -516,7 +516,7 @@ const handleUpdate = (obj) => {
                     style={{ width: '500px' }}
                     fluid />
                 </MDBCardBody>
-              {!data.studentId  && !showAdminBoard && !showMentorBoard &&
+              {!data.studentId  &&
                 <Button onClick={() => bookCourse()} btnStyle="primary">Записаться на курс</Button>
                 }
               </MDBCard>

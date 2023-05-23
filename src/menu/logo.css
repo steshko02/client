@@ -7,7 +7,7 @@
     color: #ffffff;
   }
 
-  h1 {
+  .logo-a {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 48px;
     font-weight: bold;
@@ -17,7 +17,7 @@
     transition: color 0.3s ease-in-out;
   }
   
-  h1:hover {
+  .logo:hover {
     color: #00adb5;
   }
   
@@ -33,7 +33,7 @@
     }
   }
   
-  h1:hover::after {
+  .logo:hover::after {
     content: '';
     display: block;
     width: 100%;

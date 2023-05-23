@@ -1,0 +1,81 @@
+.slider-container {
+    background: linear-gradient(to bottom, #0000ff, #ffffff);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: calc(130v); /* Вычтите 50px от высоты видимой области */
+    margin-bottom: 20px; /* Добавьте отступ 50px от нижнего края страницы */
+    margin-top: 20px; /* Добавьте отступ 50px от нижнего края страницы */
+  }
+  
+  .slider-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .slider-item.left {
+    flex-direction: row-reverse;
+  }
+  
+  .slider-item.right {
+    flex-direction: row;
+    text-align: right;
+  }
+  
+  .image-description {
+    /* background-color: #6b9cdb; */
+    padding: 10px;
+    margin-right: 10px;
+  }
+  
+  .image-description.left {
+    margin-left: 60px;
+        margin-left: 380px;
+        margin-right: 80px;
+
+  }
+  
+  .image-description.right {
+    margin-left: 80px;
+    margin-right: 380px;
+
+}
+  
+  .image-description .p1 {
+    color: #e5e5ffc0;
+  }
+  
+  .image-description .p2 {
+    color: #0000ffbf;
+  }
+
+  .image-description .p3 {
+    color: #1e1e3bc0;
+  }
+  .slider-item img {
+    width: 600px;
+    height: auto;
+    transition: transform 0.3s;
+    padding-top: 30px;
+  }
+  
+  .slider-item img:hover {
+    transform: scale(1.1);
+  }
+
+  .image-wrapper-left {
+    background-blend-mode: overlay;
+    padding-left: 100px;
+  }
+  .image-wrapper-right {
+    background-blend-mode: overlay;
+    padding-right: 100px;  
+}
+
+.greeting {
+    color: #ffffff;
+    margin-top: 0;
+  }

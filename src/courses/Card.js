@@ -21,7 +21,7 @@ import Helper from "../services/Helper"
 const API_URL = "http://localhost:8080/";
 
 
-let PageSize = 10;
+let PageSize = 8;
 function Cards() {
 
     const token = AuthService.getCurrentJwt()

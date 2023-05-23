@@ -28,7 +28,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import { Stack } from "@mui/material";
 
-let PageSize = 10;
+let PageSize = 4;
 export default function BoardAdmin() {
  
   const token = AuthService.getCurrentJwt()
