@@ -207,7 +207,7 @@ const vcode = value => {
             message: resMessage
           });
         }
-      );
+      ); 
     } else {
       this.setState({
         loading: false

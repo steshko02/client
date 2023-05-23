@@ -1,10 +1,7 @@
-import EventBus from "../common/EventBus";
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+
 import React, { useEffect, useState,useMemo } from 'react';
-import { useNavigate } from "react-router-dom";
 import Pagination from "../services/Pagination";
 import axios from "axios";
-import http from "../http-common";
 import AuthService from "../services/auth.service";
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -22,9 +19,6 @@ import Helper from "../services/Helper"
 import Paper from '@mui/material/Paper';
 import Form from "react-validation/build/form";
 import "./status.css"
-import {
-  MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardText, MDBCardBody, MDBCardImage, MDBBtn, MDBBreadcrumb, MDBBreadcrumbItem, MDBProgress, MDBProgressBar, MDBIcon,MDBListGroup,MDBListGroupItem, MDBCardLink
-} from 'mdb-react-ui-kit';
 import { Button, Dropdown, Input, Page, setOptions,Textarea,Datepicker,Stepper, Select, Checkbox } from '@mobiscroll/react';
 import '@mobiscroll/react/dist/css/mobiscroll.min.css';
 const API_URL = "http://localhost:8080/";

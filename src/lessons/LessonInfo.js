@@ -56,7 +56,6 @@ function LessonInfo() {
     },
 [addWork]);
 
-// /mentors/lesson/{id}
 
 var handleClose = () => setShowModal(false);
 
