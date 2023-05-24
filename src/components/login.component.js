@@ -6,7 +6,6 @@ import { isEmail } from "validator";
 import "../App.css";
 
 import AuthService from "../services/auth.service";
-import { Navigate } from "react-router-dom";
 import { withRouter } from '../common/with-router';
 
 const required = value => {
