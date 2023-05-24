@@ -41,6 +41,7 @@ export default function BoardAdmin() {
 });
 const [post, setPost] = useState([]);
 const [addLesson, setaddLesson] = useState(0);
+const [showExc, setshowExc] = useState(null);
 const [status, setStatus] = useState('CONSIDERED');
 const [filter, setfilter] = useState({
   user: '',
@@ -88,71 +89,89 @@ const handleChange = (e) => {
         totalCount: response.data.totalCount
       });
       setaddLesson(response.data.totalCount);
+    })
+    .catch((response) => {
+      const resMessage =
+      (response.response &&
+        response.response.data &&
+        response.response.data.message) ||
+        response.message ||
+        response.toString();
+      setshowExc(resMessage);
     });
   },  
 [pagination.currentPage, addLesson, status, filter]);
 
     return (
-      <div className="container">
-        <br/>
-        <br/>
-        <br/>
-      <Tabs>
-      <TabList>
-        <Tab onClick={() => setStatus('CONSIDERED')}>Новые</Tab>
-        <Tab onClick={() => setStatus('APPROWED')}>Подтвежденные</Tab>
-        <Tab onClick={() => setStatus('CANCELLED')}>Отклоненные</Tab>
-      </TabList>
-      <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpenFilter(!openFilter)}
-            className = "left-filter-button"
-          >   Поиск
-            {openFilter ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-          <Collapse in={openFilter} timeout="auto" unmountOnExit>
-           <div className="filter">
-            <span> Пользователь  </span><input name="user" onChange={handleChange}></input>
-           <span className="pad-left"> Курс </span><input name="course" onChange={handleChange}></input>
-           </div>
-           </Collapse>
-      {/* <Button onClick={() => findOn(true)}>Поиск</Button> */}
-      <TabPanel>
-         <CollapsibleTable data = {post} handleUpdate={handleUpdate}/>
-         <Pagination
-        className="pagination-bar fixed"
-        currentPage= {pagination.currentPage}
-        totalCount= {pagination?.totalCount}
-        pageSize= {PageSize}
-        onPageChange={page => setPagination({
-            ...pagination,
-          currentPage: page })} />
-      </TabPanel>
-      <TabPanel>
-      <CollapsibleTable data = {post} handleUpdate={handleUpdate}/>
-         <Pagination
-        className="pagination-bar fixed"
-        currentPage= {pagination.currentPage}
-        totalCount= {pagination?.totalCount}
-        pageSize= {PageSize}
-        onPageChange={page => setPagination({
-            ...pagination,
-          currentPage: page })} />
-      </TabPanel>
-      <TabPanel>
-      <CollapsibleTable data = {post} handleUpdate={handleUpdate}/>
-         <Pagination
-        className="pagination-bar fixed"
-        currentPage= {pagination.currentPage}
-        totalCount= {pagination?.totalCount}
-        pageSize= {PageSize}
-        onPageChange={page => setPagination({
-            ...pagination,
-          currentPage: page })} />
-      </TabPanel>
-    </Tabs>
-    </div>
+      <><div className="container">
+          {!showExc &&
+        <><br /><br /><br /><Tabs>
+            <TabList>
+              <Tab onClick={() => setStatus('CONSIDERED')}>Новые</Tab>
+              <Tab onClick={() => setStatus('APPROWED')}>Подтвежденные</Tab>
+              <Tab onClick={() => setStatus('CANCELLED')}>Отклоненные</Tab>
+            </TabList>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpenFilter(!openFilter)}
+              className="left-filter-button"
+            >   Поиск
+              {openFilter ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+            <Collapse in={openFilter} timeout="auto" unmountOnExit>
+              <div className="filter">
+                <span> Пользователь  </span><input name="user" onChange={handleChange}></input>
+                <span className="pad-left"> Курс </span><input name="course" onChange={handleChange}></input>
+              </div>
+            </Collapse>
+            {/* <Button onClick={() => findOn(true)}>Поиск</Button> */}
+            <TabPanel>
+              <CollapsibleTable data={post} handleUpdate={handleUpdate} />
+              <Pagination
+                className="pagination-bar fixed"
+                currentPage={pagination.currentPage}
+                totalCount={pagination?.totalCount}
+                pageSize={PageSize}
+                onPageChange={page => setPagination({
+                  ...pagination,
+                  currentPage: page
+                })} />
+            </TabPanel>
+            <TabPanel>
+              <CollapsibleTable data={post} handleUpdate={handleUpdate} />
+              <Pagination
+                className="pagination-bar fixed"
+                currentPage={pagination.currentPage}
+                totalCount={pagination?.totalCount}
+                pageSize={PageSize}
+                onPageChange={page => setPagination({
+                  ...pagination,
+                  currentPage: page
+                })} />
+            </TabPanel>
+            <TabPanel>
+              <CollapsibleTable data={post} handleUpdate={handleUpdate} />
+              <Pagination
+                className="pagination-bar fixed"
+                currentPage={pagination.currentPage}
+                totalCount={pagination?.totalCount}
+                pageSize={PageSize}
+                onPageChange={page => setPagination({
+                  ...pagination,
+                  currentPage: page
+                })} />
+            </TabPanel>
+          </Tabs></>
+      }
+      </div>
+      <br/>
+      <br/>
+        <div >
+          {showExc &&
+            <h1>{showExc}</h1>}
+        </div></>
+
     );
   }
   
