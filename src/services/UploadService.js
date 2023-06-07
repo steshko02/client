@@ -20,6 +20,27 @@ class UploadFilesService {
     });
   }
 
+
+  uploadFiles(file,path, onUploadProgress) {
+
+    const token = AuthService.getCurrentJwt();
+    const config = {
+        headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*","Content-Type": "multipart/form-data",}
+    };
+
+    let formData = new FormData();
+
+    for (let i = 0; i < file.length; i++) {
+      formData.append('file', file[i]);
+    }
+
+    return http.post(path, formData, config, {
+      config,
+      onUploadProgress,
+    });
+  }
+
+
   upload(file,path) {
 
     const token = AuthService.getCurrentJwt();

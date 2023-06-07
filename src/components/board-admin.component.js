@@ -191,7 +191,7 @@ function Row({rowData, handleUpdate}) {
                     <TableCell ><b>Id пользователя</b></TableCell>
                     <TableCell ><b>Id курса</b></TableCell>
                     <TableCell ><b>Email</b></TableCell>
-                    <TableCell ><b>Свободных мест/всего мест</b></TableCell>
+                    <TableCell ><b>Занято/всего мест</b></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

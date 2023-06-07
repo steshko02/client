@@ -35,6 +35,11 @@ export default function LessonForm({handleClose, handleUpdate, courseId, lessonI
 
   const [users, setUsers] = useState([]);
 
+  const [res, setRes] = React.useState([]);
+  const [newRes, setNewRes] = React.useState([]);
+
+
+
   const handleCheckedFiles = () => {
     setcheckedFiles(!checkedFiles);
   };
@@ -58,8 +63,34 @@ export default function LessonForm({handleClose, handleUpdate, courseId, lessonI
       dateStart: null,
       dateEnd: null,
       userIds: "",
-      id: lessonId
+      id: lessonId,
+      resourceDtos: []
   });
+
+
+  const changeRes = (ev, newData) => {
+    const isChecked = ev.target.checked; // Получаем текущее значение чекбокса
+  
+    if (newRes.includes(newData)) {
+      // Если данные уже есть, удаляем их из массива
+      const updatedData = newRes.filter((item) => item !== newData);
+      setNewRes(updatedData);
+      setLesson((prevState) => ({
+        ...prevState,
+        resourceDtos: updatedData,
+      }));
+    } else {
+      // Если данных нет, добавляем их в массив
+      const updatedData = [...newRes, newData];
+      setNewRes(updatedData);
+      setLesson((prevState) => ({
+        ...prevState,
+        resourceDtos: updatedData,
+      }));
+    }
+   
+    ev.target.checked = !isChecked; // Инвертируем значение чекбокса
+  };
 
   const [video, setvideo] = useState({
     courseId: courseId,
@@ -100,6 +131,7 @@ export default function LessonForm({handleClose, handleUpdate, courseId, lessonI
           ...files,
           fileInfos: files.data,
         });
+        handleClose();
       })
       .catch(() => {
         setFiles({
@@ -118,7 +150,6 @@ export default function LessonForm({handleClose, handleUpdate, courseId, lessonI
           headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
       },
     ).then((response) => {
-      console.log(response.data);
       setLesson(
         {
             id: lessonId,
@@ -127,10 +158,13 @@ export default function LessonForm({handleClose, handleUpdate, courseId, lessonI
             description: response.data.description,
             dateStart: response.data.dateStart,
             dateEnd: response.data.dateEnd,
+            resourceDtos: response.data.resourceDtos,
             userIds: response.data.mentors?.map((item)=>{
                 return item.uuid;
             })
-        }
+        },
+        setRes(response.data.resourceDtos),
+        setNewRes(response.data.resourceDtos)
       );
     });
 
@@ -147,17 +181,17 @@ export default function LessonForm({handleClose, handleUpdate, courseId, lessonI
 
 
   const upload = (id) => {
-    let currentFile = files.selectedFiles[0];
+    let currentFile = files.selectedFiles;
 
     setFiles({
       ...files,
       progress: 0,
       currentFile: currentFile,
     });
-      UploadService.upload(currentFile, API_URL + "lessons/upload/"+courseId+"/" + id, (event) => {
+      UploadService.uploadFiles(currentFile, API_URL + "lessons/upload-files/"+courseId+"/" + id, (event) => {
         setFiles({
           ...files,
-          progress: Math.round((100 * event.loaded) / event.total),
+          progress: Math.round((100 * event.loaded) / event.total), 
         });
     })
       .then((response) => {
@@ -165,6 +199,7 @@ export default function LessonForm({handleClose, handleUpdate, courseId, lessonI
           ...files,
           message: response.data.message,
         });
+        handleClose();
         return UploadService.getFiles();
       })
       .then((files) => {
@@ -227,11 +262,13 @@ export default function LessonForm({handleClose, handleUpdate, courseId, lessonI
     axios.post(API_URL + "lessons", lessonData,config)
     .then((response) => {
       const LessId = response.data;
-      handleClose();
       if(checkedFiles){
-        if(files.selectedFiles.length!==0){
+        if(files.selectedFiles && files.selectedFiles.length!==0){
         upload(LessId);
+        handleClose();
         }
+      } else {
+        handleClose();
       }
 
       if(checkedVideo){
@@ -248,8 +285,9 @@ export default function LessonForm({handleClose, handleUpdate, courseId, lessonI
           uploadVideo(res.data)
         );
       }
+    } else {
+      handleClose();
     }
-      handleUpdate(1);
     });
   };
 
@@ -335,9 +373,19 @@ const getUsers = (id) => {
                                   onChange={handleCheckedFiles}
                                 /> <spa>Добавить файлы</spa>
                                 { checkedFiles && (
-                                <div className="mbsc-col-md-12 mbsc-col-10">
-                                <Input onChange={selectFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Select text files..." label="Files upload"></Input>
-                                </div>
+                                <><div className="mbsc-col-md-12 mbsc-col-10">
+                        <Input onChange={selectFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Select text files..." label="Files upload"></Input>
+                      </div><span>Ресурсы: </span><div>
+                          {res?.map((items) => {
+                            return (<>
+                              <input
+                                onChange={(ev) => changeRes(ev, items)} type="checkbox"
+                                checked={newRes.includes(items)}
+                              ></input>
+                              <a href={items.url}>
+                                {items.filename}</a><br /></>);
+                          })}
+                        </div></>
                           )} </div> 
                          <div className="mbsc-col-md-6 mbsc-col-6"><input type="checkbox"
                                 checked={checkedVideo}

@@ -7,7 +7,7 @@ import { Routes, Route, Link } from "react-router-dom";
 
 import AuthService from "../services/auth.service";
 const Menu = styled.nav`
-  position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   bottom: 0px;

@@ -42,14 +42,14 @@ export default function AnswerForm({handleAnswerClose, handleUpdate, work, data,
   
   
     const upload = (id) => {
-      let currentFile = files.selectedFiles[0];
+      let currentFile = files.selectedFiles;
   
       setFiles({
         ...files,
         progress: 0,
         currentFile: currentFile,
       });
-        UploadService.upload(currentFile, API_URL + "answer/upload/"+ id, (event) => {
+        UploadService.uploadFiles(currentFile, API_URL + "answer/upload-files/"+ id, (event) => {
           setFiles({
             ...files,
             progress: Math.round((100 * event.loaded) / event.total),

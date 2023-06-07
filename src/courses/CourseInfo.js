@@ -408,7 +408,7 @@ const handleUpdate = (obj) => {
 
   const bookCourse = () => {
     bookCourseTest(location.state.itemId);
-    handleUpdate();
+    handleUpdate(1);
   }
 
   const bookCourseTest = (id) =>{
@@ -516,8 +516,15 @@ const handleUpdate = (obj) => {
                     style={{ width: '500px' }}
                     fluid />
                 </MDBCardBody>
-              {!data.studentId  &&
+              {!data.studentId && !showAdminBoard && data.mentorId === null &&  data.bookingStatus ===null &&               
                 <Button onClick={() => bookCourse()} btnStyle="primary">Записаться на курс</Button>
+                
+                }
+                {data.bookingStatus === 'CONSIDERED' &&
+                  <Button btnStyle="primary" disabled>Ваша заявка на рассмотрении</Button>
+                }
+                {data.bookingStatus === 'CANCELLED' &&
+                  <Button btnStyle="primary" disabled>Ваша заявка отклонена</Button>
                 }
               </MDBCard>
               <MDBCard className="mb-4 mb-lg-0">
