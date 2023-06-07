@@ -8,7 +8,7 @@ import Form from "react-validation/build/form";
 import UploadService from "../services/UploadService";
 
 const API_URL = "http://localhost:8080/";
- export default function WorkForm({ handleClose, lessId, courseId}){
+ export default function WorkForm({handleUpdate, handleClose, lessId, courseId}){
 
     const token = AuthService.getCurrentJwt()
     const config = {
@@ -21,11 +21,37 @@ const API_URL = "http://localhost:8080/";
         lessonId: lessId,
         title: "",
         description: "",
-        deadline: null
+        deadline: null,
+        resource: []
     });
   
     const [res, setRes] = React.useState([]);
+    const [newRes, setNewRes] = React.useState([]);
     const [workUpdate, setWorkUpdate] = React.useState(0);
+
+    const changeRes = (ev, newData) => {
+      const isChecked = ev.target.checked; // Получаем текущее значение чекбокса
+    
+      if (newRes.includes(newData)) {
+        // Если данные уже есть, удаляем их из массива
+        const updatedData = newRes.filter((item) => item !== newData);
+        setNewRes(updatedData);
+        setWork((prevState) => ({
+          ...prevState,
+          resource: updatedData,
+        }));
+      } else {
+        // Если данных нет, добавляем их в массив
+        const updatedData = [...newRes, newData];
+        setNewRes(updatedData);
+        setWork((prevState) => ({
+          ...prevState,
+          resource: updatedData,
+        }));
+      }
+     
+      ev.target.checked = !isChecked; // Инвертируем значение чекбокса
+    };
 
     useEffect(() => {
         axios.get("http://localhost:8080/works/byLesson/"+lessId,
@@ -40,9 +66,11 @@ const API_URL = "http://localhost:8080/";
             title: response.data.title,
             description: response.data.description,
             deadline: response.data.deadline,
-            lessonId: lessId
+            lessonId: lessId,
+            resource: response.data.resource
             },
-            setRes(response.data.resource)
+            setRes(response.data.resource),
+            setNewRes(response.data.resource)
           );
         });
       },
@@ -59,26 +87,26 @@ const API_URL = "http://localhost:8080/";
     });
   
     const upload = (id) => {
-      let currentFile = files.selectedFiles[0];
+      let currentFile = files.selectedFiles;
   
       setFiles({
         ...files,
         progress: 0,
         currentFile: currentFile,
       });
-        UploadService.upload(currentFile, API_URL + "works/upload/"+courseId+"/" + lessId +"/"+ id, (event) => {
+        UploadService.uploadFiles(currentFile, API_URL + "works/upload-files/"+courseId+"/" + lessId +"/"+ id, (event) => {
           setFiles({
             ...files,
             progress: Math.round((100 * event.loaded) / event.total),
           });
+          
       })
         .then((response) => {
-          update();
+          handleClose();
           setFiles({
             ...files,
             message: response.data.message,
           });
-          update();
           return UploadService.getFiles();
           
         })
@@ -87,7 +115,6 @@ const API_URL = "http://localhost:8080/";
             ...files,
             fileInfos: files.data,
           });
-          update();
         })
         .catch(() => {
           setFiles({
@@ -120,12 +147,6 @@ const API_URL = "http://localhost:8080/";
         [e.target.name]: value
       });
     };
-  
-    const update = () => {
-        setWorkUpdate(
-        workUpdate+1
-        );
-      };
 
     const postWork = (e) => {
       e.preventDefault();
@@ -137,12 +158,14 @@ const API_URL = "http://localhost:8080/";
           ...work,
           workId: workId
         })
-          if(files?.selectedFiles.length!==0){
+      if( files.selectedFiles && files.selectedFiles.length!==0 ){
           upload(workId);
           handleClose();
+      }         handleClose();
+
       }
-      }
-      ).then(resp=>{update();});
+      );
+      
     };
   
     return(
@@ -196,17 +219,23 @@ const API_URL = "http://localhost:8080/";
                                   <Input  onChange={selectFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Select text files..." label="Files upload"></Input>
                                   </div>
                                   <div>
-                                  <span>Ресурсы: </span>
-                                  <div>
-                                  {res?.map((items) => {
-                                    return (<><a href={items.url}>
-                                        {items.filename}</a><br/></>)
+                                {res &&
+                                  <><span>Ресурсы: </span><div>
+                                    {res?.map((items) => {
+                                      return (<>
+                                      <input 
+                                       onChange={(ev) => changeRes(ev,items)} type="checkbox"
+                                       checked={newRes.includes(items)}
+                                       ></input>
+                                      <a href={items.url}>
+                                        {items.filename}</a><br /></>);
                                     })}
-                                 </div>
+                                  </div></>
+                                }
                                   </div>
                               </div>
                               <Button 
-                                type="submit">Save</Button>
+                                type="submit">Сохранить</Button>
                           </div>  
   
                       </div>

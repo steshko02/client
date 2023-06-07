@@ -50,16 +50,25 @@ function LessonInfo() {
         if(response.data.work){
         setaddWork(response.data.work.id);
         setIsAdminOrMentor(showAdminBoard || (data.userId===null ||  data.mentorId===""));
-
         }
-            });
+        });
     },
 [addWork]);
 
 
 var handleClose = () => setShowModal(false);
 
+var handleCloseLesson = () => {
+  setshowLessonModal(false);
+  handleUpdate(1);
+}
+
 var handleAnswerClose = () => setShowAnswerModal(false);
+
+var closeWork = () =>{ 
+  setshowWorkModal(false);
+  handleUpdate(1);
+};
 
 const deleteWork = (id) => {
 
@@ -156,7 +165,8 @@ const handleUpdate = (obj) => {
         </div>
         <WorkForm 
         courseId= {data.courseId}
-         handleClose ={() => setshowWorkModal(false)} lessId ={data.id} />
+        handleUpdate={handleUpdate}
+         handleClose ={closeWork} lessId ={data.id} />
       </div>
   
     </Modal>
@@ -178,7 +188,7 @@ const handleUpdate = (obj) => {
         </div>
         <LessonForm 
          courseId= {data.courseId}
-          handleClose ={() => setshowLessonModal(false)} handleUpdate={handleUpdate} lessonId ={data.id} />
+          handleClose ={handleCloseLesson} handleUpdate={handleUpdate} lessonId ={data.id} />
       </div>
   
     </Modal>
@@ -224,17 +234,15 @@ const handleUpdate = (obj) => {
                     </MDBCol>
                   </MDBRow>
                   <MDBRow>
-                  <MDBCol sm="9">
+                  <MDBCol sm="12">
                   <br/>
 
                       <MDBCardText>Прикрепленные файлы:</MDBCardText>
                   </MDBCol>
                   <>
-                    <MDBCol sm="9" >
-                    {data.work.resource?.map((items, index) => {
-                      return (<a href={items.url}>
-                        {/* <img src="http://s1.iconbird.com/ico/2013/2/634/w42h50139292027210.png"/> */}
-                        {items.filename}</a>)
+                    <MDBCol sm="12" >
+                    {data.work.resource?.map((items) => {
+                      return (<><a href={items.url}>{items.filename}</a><br /></>)
                     })}
                     </MDBCol>
                     </>
@@ -347,6 +355,21 @@ const handleUpdate = (obj) => {
                          </MDBCardText>
                     </MDBCol>
                   </MDBRow>
+                  <hr />
+                {
+                data.resourceDtos?.length!=0  &&
+                  <MDBRow>
+                    <MDBCol sm="4">
+                      <MDBCardText>Ресурсы</MDBCardText>
+                    </MDBCol>
+                    <MDBCol sm="8">
+                      <MDBCardText className="text-muted">{data.resourceDtos?.map((items) => {
+                    return (<a href={items.url}>
+                      {items.filename}</a>)})}
+                         </MDBCardText>
+                    </MDBCol>
+                  </MDBRow>
+                }
                 </MDBCardBody>
               </MDBCard>
 
@@ -355,6 +378,8 @@ const handleUpdate = (obj) => {
            
               {/* </MDBCol> */}
           </MDBRow>
+          { data.studentId ===null && data.mentorId !==null &&
+
           <MDBRow>
                 <MDBCol md="6">
                   <MDBCard className="mb-4 mb-md-4">
@@ -372,6 +397,26 @@ const handleUpdate = (obj) => {
                   </MDBCard>
                 </MDBCol>
               </MDBRow>
+}
+{ showAdminBoard &&
+<MDBRow>
+      <MDBCol md="6">
+        <MDBCard className="mb-4 mb-md-4">
+          <MDBCardBody>
+            <MDBCardText className="mb-4"><span className="text-primary font-italic me-1">Функции администратора</span>  </MDBCardText>
+            <><button onClick={() => setshowLessonModal(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
+            Изменить занятие
+          </button><br /></>
+            { data.work && (
+            <><button  onClick={() => setshowWorkModal(true)}  type="button" class="btn btn-link" data-mdb-ripple-color="dark">
+            Изменить задание к занятию
+          </button></>
+            )}
+          </MDBCardBody>
+        </MDBCard>
+      </MDBCol>
+    </MDBRow>
+}
         </MDBContainer>
       </section></>
   );
