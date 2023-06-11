@@ -29,7 +29,7 @@
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 3px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  height: 690px;
+  height: 673px;
 }
 
 .first_block {
@@ -118,11 +118,32 @@ button.course {
 .scroll{
   overflow-y: auto;
   flex: 1;
-  max-height: 630px;
+  height: 685px;
+  padding-bottom: 15px;
 }
 
 .scroll.scroll-605{
   overflow-y: auto;
   flex: 1;
   max-height: 605px;
+  
+}
+.scrollLesson {
+  .scroll{
+    overflow-y: auto;
+    flex: 1;
+    padding-bottom: 15px;
+  }
+}
+.scrollCourseForm {
+  overflow-y: auto;
+  flex: 1;
+  height: 685px;
+  padding-bottom: 60px;
+}
+.scrollCourseForm::-webkit-scrollbar {
+  display: none;
+}
+.scrollLesson::-webkit-scrollbar {
+  display: none;
 }

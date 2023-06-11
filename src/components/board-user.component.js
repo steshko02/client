@@ -25,6 +25,8 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import { Stack } from "@mui/material";
 import Modal from "react-overlays/Modal";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import AnswerForm from '../lessons/AnswerModalForm'
 import "./status.css"
@@ -82,7 +84,7 @@ const handleUpdate = (obj) => {
       <Tabs>
       <TabList>
         <Tab>Ваши курсы</Tab>
-        <Tab>Учебный процесс</Tab>
+        {/* <Tab>Учебный процесс</Tab> */}
       </TabList>
       <TabPanel>
          <CollapsibleTable data = {post} handleUpdate={handleUpdate}/>
@@ -95,8 +97,8 @@ const handleUpdate = (obj) => {
             ...pagination,
           currentPage: page })} />
       </TabPanel>
-      <TabPanel>
-      </TabPanel>
+      {/* <TabPanel>
+      </TabPanel> */}
     </Tabs>
     </div>
     );
@@ -104,6 +106,17 @@ const handleUpdate = (obj) => {
   
 function Row({rowData, handleUpdate}) {
   const [open, setOpen] = React.useState(false);
+  const nav = useNavigate();
+
+  const redirectCourse = (id,pictureUrl) => {
+    nav("/course-info",{
+      state: {
+        itemId: id,
+        img :pictureUrl ? pictureUrl :'https://ultimateqa.com/wp-content/uploads/2020/12/Java-logo-icon-1.png'
+      }
+      });
+  };
+
   return (
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} id={rowData.id}>
@@ -116,11 +129,12 @@ function Row({rowData, handleUpdate}) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
       </TableCell>
-        <TableCell><a>{rowData.title}</a></TableCell>
+        <TableCell><a href='' onClick={()=> redirectCourse(rowData.id)}>{rowData.title}</a></TableCell>
         <TableCell>{Helper.statusByFormat(rowData.status)}</TableCell>
         <TableCell>{Helper.dateByFormat(rowData.dateStart)} - {Helper.dateByFormat(rowData.dateEnd)}</TableCell>
         <TableCell>{rowData.mentors?.map((item) => (
-            <><a href="#">{item.firstname} {item.lastname}</a><br /></>
+            // <><a href="#">{item.firstname} {item.lastname}</a><br /></>
+            <><Link to="/user" state={{ id: item.uuid }}>{item.firstname} {item.lastname}</Link><br /></>
           ))}</TableCell>
       
       </TableRow>
@@ -144,7 +158,7 @@ function Row({rowData, handleUpdate}) {
                 <TableBody>
                 
                 {rowData.lessons?.map((item) => (  
-                    <LessonCollapsibleTable item={item}/>
+                    <LessonCollapsibleTable courseId={rowData.id} item={item}/>
                 ))}
                 </TableBody>
               </Table>
@@ -157,7 +171,7 @@ function Row({rowData, handleUpdate}) {
 }
 
 
-function LessonCollapsibleTable({item,handleUpdate}) {
+function LessonCollapsibleTable({item, courseId,handleUpdate}) {
 
   const [open, setOpen] = React.useState(false)
   const [post, setPost] = useState('');
@@ -169,9 +183,23 @@ function LessonCollapsibleTable({item,handleUpdate}) {
   const [changeOnOff, setChangeOnOff] = React.useState(false)
 
   const [showAnswerModal, setShowAnswerModal] = useState(false);
-  var handleUpdateInfo = () => setaddLesson(addLesson+1);
+  var handleUpdateInfo = () => setaddLesson(addLesson+2);
   
-  var handleAnswerClose = () => setShowAnswerModal(false);
+  var handleAnswerClose = () => {
+    handleUpdateInfo();
+    setShowAnswerModal(false);
+    setOpen(true)
+  }
+  const nav = useNavigate();
+
+  const redirectLesson = (id) => {
+    nav("/lesson",{
+      state: {
+        itemId: item.id,
+        courseId: courseId
+      }
+      });
+  };
 
   useEffect(() => {
     if(open){
@@ -203,13 +231,13 @@ const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
            </IconButton>
          </TableCell>
          <TableCell component="th" scope="row">
-           {item.title}
+           <a href='' onClick={()=>redirectLesson()}>{item.title}</a>
          </TableCell>
          {item.status === 'FINISHED' && <TableCell className='finish'>{Helper.statusByFormat(item.status)}</TableCell>}
          {item.status !== 'FINISHED' && <TableCell>{Helper.statusByFormat(item.status)}</TableCell>}
          <TableCell>{Helper.dateByFormat(item.dateStart)} - {Helper.dateByFormat(item.dateEnd)}</TableCell>
          <TableCell>{item.mentors?.map((item) => (
-           <><a href="#">{item.firstname} {item.lastname}</a><br /></>
+           <><Link to="/user" state={{ id: item.uuid }}>{item.firstname} {item.lastname}</Link><br /></>
          ))}</TableCell>
        </TableRow>
        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -231,10 +259,11 @@ const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
                                          openCloseWork = {openCloseWork} setOpenCloseWork ={setOpenCloseWork}/>
                   </TableRow>
                 </TableHead>
-
                 <TableBody>
                   <TableRow>
-                    <TableCell><span className={post.work.status}><b>{Helper.statusByFormatForTask(post.answer.timeStatus)}</b></span></TableCell>
+                    <TableCell><span className={post.work.status}>
+                      <b>{Helper.statusByFormatForTask(post.answer.timeStatus)}</b></span>
+                    </TableCell>
                     <TableCell>{Helper.dateByFormat(post.answer.date)}</TableCell>
                     <TableCell><b>{post?.checkWork?.mark}</b></TableCell>
                     <TableCell>
@@ -244,12 +273,10 @@ const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
                     </TableRow>
                   </TableBody>
               </>
-                      
-                </>
+              </>
                   }
                   {openCloseTask &&  post.work &&
                                <Box sx={{ margin: 1 }}>
-
                   <>
                   <span><b>Задание: </b></span><span>{post.work.title}</span><br/>
                   <span><b>Дедлайн: </b> </span><span >{Helper.dateByFormat(post.work.deadline)}</span><br/>
@@ -257,12 +284,11 @@ const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
                   <span><b>Описание: </b> </span><span><WithLinks text={post.work.description}/></span><br/>
                   <span><b>Прикрепленные файлы: </b></span><br/>
                   {post.work.resource?.map((res) => (
-                      <span><a href={res.url}>{res.filename}</a></span>
+                      <><span><a href={res.url}>{res.filename}</a></span><br/></>
                     ))}<br/><hr/>
                   </>
                   </Box>
                   }
-                  
                    {openCloseWork && post.answer &&
                         <Box sx={{ margin: 1 }}>
                         <>
@@ -274,12 +300,11 @@ const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
                           <span><b>Прикрепленные файлы:</b></span><br />
 
                         {post.answer.resource?.map((res) => (
-                            <span><a href={res.url}>{res.filename}</a></span>
+                            <><span><a href={res.url}>{res.filename}</a></span><br /></>
                           ))}<br/>
 
                         <Button onClick={()=> setShowAnswerModal(true)}>Изменить</Button>
                         </>
-                        
                         <>
                           <Modal
                             className="modal"
@@ -297,7 +322,7 @@ const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
                                 </div>
                               </div>
 
-                              <AnswerForm handleAnswerClose={()=> setShowAnswerModal(false)} handleUpdate={handleUpdateInfo} work={post.work} data={post.answer} update={true}/>
+                              <AnswerForm handleAnswerClose={handleAnswerClose} handleUpdate={handleUpdateInfo} work={post.work} data={post.answer} update={true}/>
 
                               <div className="modal-footer course">
                                 <button className="secondary-button course" onClick={handleAnswerClose}>

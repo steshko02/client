@@ -30,6 +30,8 @@ import WorkForm from "./WorkForm"
 import LessonForm from './LessonForm';
 import {Input, Page, setOptions,Textarea,Datepicker } from '@mobiscroll/react';
 import '@mobiscroll/react/dist/css/mobiscroll.min.css';
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 let PageSize = 3;
 export default function BoardMentors() {
@@ -115,6 +117,24 @@ const handleChange = (e) => {
   
 function Row({rowData, handleUpdate}) {
   const [open, setOpen] = React.useState(false);
+  const nav = useNavigate();
+
+  const redirectCourse = (id,pictureUrl) => {
+    nav("/course-info",{
+      state: {
+        itemId: id,
+        img :pictureUrl ? pictureUrl :'https://ultimateqa.com/wp-content/uploads/2020/12/Java-logo-icon-1.png'
+      }
+      });
+  };
+  const redirectLesson = (id) => {
+    nav("/lesson",{
+      state: {
+        itemId: id,
+        courseId: rowData.id
+      }
+      });
+  };
 
   return (
     <React.Fragment>
@@ -123,16 +143,15 @@ function Row({rowData, handleUpdate}) {
           <IconButton
             aria-label="expand row"
             size="small"
-            onClick={() => setOpen(!open)}
-          >
+            onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
       </TableCell>
-        <TableCell><a>{rowData.title}</a></TableCell>
+        <TableCell><a href='' onClick={()=> redirectCourse(rowData.id)}>{rowData.title}</a></TableCell>
         <TableCell>{Helper.statusByFormat(rowData.status)}</TableCell>
         <TableCell>{Helper.dateByFormat(rowData.dateStart)} - {Helper.dateByFormat(rowData.dateEnd)}</TableCell>
         <TableCell>{rowData.mentors?.map((item) => (
-            <><a href="#">{item.firstname} {item.lastname}</a><br /></>
+            <><Link to="/user" state={{ id: item.uuid }}>{item.firstname} {item.lastname}</Link><br /></>
           ))}</TableCell>
       
       </TableRow>
@@ -140,9 +159,6 @@ function Row({rowData, handleUpdate}) {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                Пользователь
-              </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
@@ -156,17 +172,16 @@ function Row({rowData, handleUpdate}) {
                   {rowData.lessons?.map((item) => (
                    <TableRow key={item.id}>
                    <TableCell component="th" scope="row">
-                   {item.title}
-                   </TableCell>
+                   <a href='' onClick={()=>redirectLesson(item.id,rowData.id)}>{item.title}</a>               
+                       </TableCell>
                    <TableCell>{Helper.statusByFormat(item.status)}</TableCell>
                    <TableCell >{Helper.dateByFormat(item.dateStart)} - {Helper.dateByFormat(item.dateEnd)}</TableCell>
                    <TableCell>{item.mentors?.map((item) => (
-                    <><a href="#">{item.firstname} {item.lastname}</a><br /></>
+                    <><Link to="/user" state={{ id: item.uuid }}>{item.firstname} {item.lastname}</Link><br /></>
                   ))}</TableCell>
                     <TableCell><div><MenuListComposition courseId={rowData.id} id={rowData.id} lessId ={item.id} handleUpdate ={handleUpdate}/></div></TableCell>
                  </TableRow>  
                   ))}
-                  
                 </TableBody>
               </Table>
             </Box>

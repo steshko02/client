@@ -25,9 +25,35 @@ export default function AnswerForm({handleAnswerClose, handleUpdate, work, data,
     const [answer, setAnswer] = useState({
         id: data?.id,
         workId: work.id,
-        comment: data?.comment
+        comment: data?.comment,
+        resource: data?.resource
     });
-  
+
+    const [res, setRes] = React.useState([]);
+    const [newRes, setNewRes] = React.useState(data?.resource);
+
+    const changeRes = (ev, newData) => {
+      const isChecked = ev.target.checked; // Получаем текущее значение чекбокса
+    
+      if (answer.resource.includes(newData)) {
+        // Если данные уже есть, удаляем их из массива
+        const updatedData =  answer.resource.filter((resource) => resource !== newData)
+        // setNewRes(updatedData);
+        setAnswer((prevState) => ({
+          ...prevState,
+          resource: updatedData,
+        }));
+      } else {
+        // Если данных нет, добавляем их в массив
+        const updatedData = [...answer.resource, newData];
+        setAnswer((prevState) => ({
+          ...prevState,
+          resource: updatedData,
+        }));
+      }
+     
+      ev.target.checked = !isChecked; // Инвертируем значение чекбокса
+    };
   
     const [files, setFiles] = useState({
         selectedFiles: undefined ,
@@ -56,12 +82,8 @@ export default function AnswerForm({handleAnswerClose, handleUpdate, work, data,
           });
       })
         .then((response) => {
-          setFiles({
-            ...files,
-            message: response.data.message,
-          });
-          handleUpdate(3);
           handleAnswerClose();
+          handleUpdate();
           return UploadService.getFiles();
         })
         .then((files) => {
@@ -102,6 +124,7 @@ export default function AnswerForm({handleAnswerClose, handleUpdate, work, data,
     } else {
       updateAnswer(e);
     }
+    // handleAnswerClose();
   }
 
   const updateAnswer = (e) =>{
@@ -111,31 +134,31 @@ export default function AnswerForm({handleAnswerClose, handleUpdate, work, data,
     var FormData = require('form-data');
     var data = new FormData();
     setAnswer({
-        ...answer,
-        workId: work
-      })
+      ...answer,
+      workId: work
+    })
+
     var config = {
       method: 'put',
       url: API_URL + "answer",
       headers: { 
         'Authorization' : `Bearer ${token}`
       },
-      data : answerData
+      data : answer
     };
     axios(config)
     .then((response) => {
-        const answerId = response.data;
+      const answerId = response.data;
         setAnswer({
           ...answer,
           answerId: answerId
         })
-          if(files.selectedFiles.length!==0){
+          if(files.selectedFiles && files.selectedFiles.length!==0 ){
           upload(answerId);
-      }
-      }
-      ).then(resp=>handleUpdate(1));
+          handleAnswerClose();
+      }else{      handleAnswerClose();
+      }});
   }
-
 
     const postAnswer = (e) =>{
         e.preventDefault();
@@ -162,11 +185,13 @@ export default function AnswerForm({handleAnswerClose, handleUpdate, work, data,
               ...answer,
               answerId: answerId
             })
-              if(files.selectedFiles.length!==0){
-              upload(answerId);
+              if(files.selectedFiles && files.selectedFiles.length!==0 ){
+               upload(answerId);
+               handleAnswerClose();
+          } else{
+            handleAnswerClose();
           }
-          }
-          ).then(resp=>handleUpdate(1));
+        });
       }
     
     return(
@@ -190,13 +215,27 @@ export default function AnswerForm({handleAnswerClose, handleUpdate, work, data,
                                   </div>
                                 <input type="hidden" value={work.id}></input>
                                   <div className="mbsc-col-md-12 mbsc-col-12">
-                                  <Input onChange={selectFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Select text files..." label="Files upload"></Input>
+                                  <Input onChange={selectFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Выберите файлы..." label="Загрузка файлов"></Input>
+                                  {newRes &&
+                                  <><span className = "ml-3">Ресурсы: </span><div>
+                                    {newRes?.map((items) => {
+                                      return (<>
+                                      <input 
+                                       className = "ml-3"
+                                       onChange={(ev) => changeRes(ev,items)} type="checkbox"
+                                       checked={answer.resource.includes(items)}
+                                       ></input>
+                                      <a href={items.url}>
+                                        {items.filename}</a><br /></>);
+                                    })}
+                                  </div></>
+                                }
                                   </div>
                               </div>
                               <Button 
-                                type="submit">Save</Button>
+                               disabled={answer.comment==="" || !answer.comment}
+                                type="submit">Сохранить</Button>
                           </div>  
-  
                       </div>
                       </Form>
                   </div>

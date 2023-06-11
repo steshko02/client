@@ -5,6 +5,7 @@ import AuthService from "../services/auth.service";
 import http from "../http-common";
 
 const API_URL = "http://localhost:8080/";
+const maxLength = 100; // Максимальная длина поля ввода
 
 export default function UserProfile() {
  
@@ -20,6 +21,9 @@ export default function UserProfile() {
     const [isChange, setIsChange] = useState(false);
     const [state, setState] = useState({ disabled: true });
     const [hasProfile, sethasProfile] = useState(false);
+    const [errors, setErrors] = useState({}); // Состояние для хранения ошибок
+    const [isSaveDisabled, setIsSaveDisabled] = useState(false);
+
 
     const [files, setFiles] = useState({
         selectedFiles: undefined,
@@ -40,6 +44,33 @@ export default function UserProfile() {
         photoUrl: 'https://bootdey.com/img/Content/avatar/avatar7.png'
       });
 
+    //   department experience other githubUrl jobTitle
+
+      const errorMessages = {
+        firstname: 'Имя пользователя должно быть больше 2 и меньше 30 символов',
+        lastname: 'Фамилия пользователя должна быть больше 2 и меньше 30 символов',
+        email: 'Некорректный формат электронной почты',
+        phoneNumber: 'Некорректный формат номера телефона',
+        department: 'Департамент должен быть не больше 30 символов',
+        experience: 'Опты может состоять только из цифр',
+        other: 'Информация должнф быть не больше 100 символов',
+        githubUrl: 'Некорректный формат GitHub URL',
+        jobTitle: 'Поле должно быть не более 40 символов',
+        // Остальные сообщения об ошибках
+      };
+
+      const validationRules = {
+        firstname: (value) => value.trim().length <= 2 || value.trim().length > 30,
+        lastname: (value) => value.trim().length <= 2 || value.trim().length > 30,
+        email: (value) => !/^\S+@\S+\.\S+$/.test(value),
+        phoneNumber: (value) => !(/^\+[\d]{12}$/.test(value)),
+        githubUrl: (value) => !/^https:\/\/github\.com/.test(value),
+        experience: (value) => !/^\d+$/.test(value),
+        jobTitle: (value) => value.trim().length <= 3 || value.trim().length > 40,
+        other: (value) => value.trim().length <= 3 || value.trim().length > 100,
+        department: (value) => value.trim().length <= 3 || value.trim().length > 30,
+        // Остальные правила валидации
+      };
 
       const handleChange = (e) => {
         const value = e.target.value;
@@ -48,6 +79,20 @@ export default function UserProfile() {
           [e.target.name]: value
         });
         setIsChange(true);
+        const hasErrors = Object.values(errors).some((error) => error !== '');
+              setIsSaveDisabled(hasErrors);
+        if (validationRules[e.target.name](value)) {
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              [e.target.name]: errorMessages[e.target.name],
+            }));
+          } else {
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              [e.target.name]: '', // Сброс ошибки, если данные валидны
+            }));
+          }
+
       };
 
       const handleShowButton = (e) => {
@@ -197,25 +242,48 @@ export default function UserProfile() {
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="fullName">Имя</label>
-                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.firstname} type="text" name="firstname" className="form-control" id="fullName" placeholder="Enter full name" />
+                                          <input 
+                                        className={`form-control ${errors.firstname ? 'is-invalid' : ''}`}
+
+                                          disabled = {state.disabled}
+                                           onChange={handleChange} 
+                                           value={profile.firstname}
+                                            type="text" name="firstname"
+                                              id="fullName" placeholder="Enter full name" />
                                       </div>
+                                      {errors.firstname && <div style={{ color: 'red', fontSize: '12px' }}>{errors.firstname}</div>}
+
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="fullName">Фамилия</label>
-                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.lastname} type="text" name="lastname"  className="form-control" id="fullName" placeholder="Enter full name" />
+                                          <input
+                                          className={`form-control ${errors.lastname ? 'is-invalid' : ''}`}
+
+                                          disabled = {state.disabled} onChange={handleChange} value={profile.lastname} type="text" name="lastname"  id="fullName" placeholder="Enter full name"/>
                                       </div>
+                                      {errors.lastname && <div style={{ color: 'red', fontSize: '12px' }}>{errors.lastname}</div>}
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="eMail">Email</label>
-                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.email} type="email" name="email" className="form-control" id="eMail" placeholder="Enter email ID" />
+                                          <input
+                                   className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+
+                                          disabled = {state.disabled} onChange={handleChange} value={profile.email} type="email" name="email" id="eMail" placeholder="Enter email ID"/>
                                       </div>
+                                      {errors.email && <div style={{ color: 'red', fontSize: '12px' }}>{errors.email}</div>}
+
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="phone">Телефон</label>
-                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.phoneNumber} type="text" name="phoneNumber"  className="form-control" id="phone" placeholder="Enter phone number" />
+                                          <input 
+                                        className={`form-control ${errors.phoneNumber ? 'is-invalid' : ''}`}
+                                          disabled = {state.disabled} onChange={handleChange} value={profile.phoneNumber} type="text"
+                                           name="phoneNumber"  id="phone" placeholder="Enter phone number" />
+                                             {errors.phoneNumber && <div style={{ color: 'red', fontSize: '12px' }}>{errors.phoneNumber}</div>}
+
                                       </div>    
                                   </div>
                               </div>
@@ -226,25 +294,46 @@ export default function UserProfile() {
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="website">GitHub URL</label>
-                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.githubUrl} type="url" name="githubUrl"  className="form-control" id="website" placeholder="Website url" />
+                                          <input
+                                           className={`form-control ${errors.githubUrl ? 'is-invalid' : ''}`}
+                                           disabled = {state.disabled} onChange={handleChange}
+                                            value={profile.githubUrl} type="url" name="githubUrl"  
+                                             id="website" placeholder="Website url" />
+                                              {errors.githubUrl && <div style={{ color: 'red', fontSize: '12px' }}>{errors.githubUrl}</div>}
                                       </div>
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="Street">Должность</label>
-                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.jobTitle} type="name" name="jobTitle"  className="form-control" id="Street" placeholder="Enter Street" />
+                                          <input 
+                                           className={`form-control ${errors.jobTitle ? 'is-invalid' : ''}`}
+                                          disabled = {state.disabled} 
+                                          onChange={handleChange} value={profile.jobTitle}
+                                           type="name" name="jobTitle" id="Street" placeholder="Enter Street" />
+                                           {errors.jobTitle && <div style={{ color: 'red', fontSize: '12px' }}>{errors.jobTitle}</div>}
+
                                       </div>
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
                                           <label for="ciTy">Департамент</label>
-                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.department}  type="name" name="department"  className="form-control" id="ciTy" placeholder="Enter City" />
+                                          <input
+                                             className={`form-control ${errors.department ? 'is-invalid' : ''}`}
+                                           disabled = {state.disabled} onChange={handleChange} 
+                                           value={profile.department}  type="name" name="department"  id="ciTy" placeholder="Enter City" />
+                                    {errors.department && <div style={{ color: 'red', fontSize: '12px' }}>{errors.department}</div>}
+
                                       </div>
                                   </div>
                                   <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
-                                          <label for="sTate">Опыт</label>
-                                          <input disabled = {state.disabled} onChange={handleChange} value={profile.experience} type="text" name="experience" className="form-control" id="sTate" placeholder="Enter State" />
+                                          <label for="sTate">Опыт (лет)</label>
+                                          <input 
+                                            className={`form-control ${errors.experience ? 'is-invalid' : ''}`}
+                                          disabled = {state.disabled} onChange={handleChange} value={profile.experience} type="text" name="experience"
+                                           id="sTate" placeholder="Enter State" />
+                                          {errors.experience && <div style={{ color: 'red', fontSize: '12px' }}>{errors.experience}</div>}
+
                                       </div>
                                   </div>  
                               </div>
@@ -254,7 +343,12 @@ export default function UserProfile() {
                                   </div>
                                   <div className="col-xl-12 col-lg-6 col-md-6 col-sm-6 col-12">
                                       <div className="form-group">
-                                          <textarea disabled = {state.disabled} onChange={handleChange} value={profile.other} type="text" name="other" className="form-control" id="fullName" placeholder="Enter full name" />
+                                          <textarea
+                                          className={`form-control ${errors.other ? 'is-invalid' : ''}`}
+                                          disabled = {state.disabled} onChange={handleChange} value={profile.other} type="text" name="other"
+                                           id="fullName" placeholder="Enter full name" />
+                                          {errors.other && <div style={{ color: 'red', fontSize: '12px' }}>{errors.other}</div>}
+
                                       </div>
                                   </div>
                                 </div>
@@ -266,7 +360,8 @@ export default function UserProfile() {
                                           <span>   </span></>
                                         }
                                          {isChange && 
-                                          <><button onClick={postProfile} type="button" id="submit" name="submit" className="btn btn-primary">Сохранить</button><span>   </span></>
+                                          <><button   disabled={isSaveDisabled}
+                                          onClick={postProfile} type="button" id="submit" name="submit" className="btn btn-primary">Сохранить</button><span>   </span></>
                                          }
                                           <button onClick={handleChangeCansel} type="button" id="submit" name="submit" className="btn btn-secondary">Отменить</button>
                                       </div>

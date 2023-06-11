@@ -29,7 +29,7 @@ const API_URL = "http://localhost:8080/";
   const showMentorBoard = currentUser ? currentUser.roles.includes("ROLE_LECTURER") : false
   const showStudentBoard = currentUser ? currentUser.roles.includes("ROLE_STUDENT") : false
 
-  function LessonForm({handleUpdate}){
+  function LessonForm({datetime, handleUpdate, handleClose}){
 
   const location = useLocation();
   const token = AuthService.getCurrentJwt()
@@ -37,7 +37,24 @@ const API_URL = "http://localhost:8080/";
       headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
   };
   const [range, setRange] = React.useState(null);
+  const [errors, setErrors] = useState({}); // Состояние для хранения ошибок
+  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
 
+  const errorMessages = {
+    title: 'Имя пользователя должно быть больше 2 и меньше 30 символов',
+    description: 'Описание должно быть больше 10 и меньше 100 символов',
+    dateRange: 'Количество мест является обязаельным полем, должно бьть больше 5 и не должно превышать 100',
+    selectMentors: 'Поле не должно быть пустым'
+    // Остальные сообщения об ошибках
+  };
+  const currentDate = new Date(); // Текущая дата
+
+  const validationRules = {
+    title: (value) => value.trim().length <= 2 || value.trim().length > 30,
+    description: (value) => value.trim().length <= 10 || value.trim().length > 100,
+    selectMentors:  (value) =>  value.length < 1 ||  value.length > 5
+    // Остальные правила валидации
+  };
 
   const [checkedFiles, setcheckedFiles] = useState(false);
 
@@ -54,11 +71,24 @@ const API_URL = "http://localhost:8080/";
   };
 
   
-  const selectedChange = (ev) => {
+  const selectedChange = (e) => {
       setLesson({
         ...lesson,
-        userIds: ev.value
+        userIds: e.value
       })
+      if (validationRules.selectMentors(e.value)) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          ["selectMentors"]: errorMessages.selectMentors,
+        }));
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          ["selectMentors"]: '', // Сброс ошибки, если данные валидны
+        }));
+      }
+      const hasErrors = Object.values(errors).some((error) => error !== '');
+      setIsSaveDisabled(hasErrors);
      };
 
   const [lesson, setLesson] = useState({
@@ -200,6 +230,19 @@ const API_URL = "http://localhost:8080/";
       ...lesson,
       [e.target.name]: value
     });
+    if (validationRules[e.target.name](value)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [e.target.name]: errorMessages[e.target.name],
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [e.target.name]: '', // Сброс ошибки, если данные валидны
+      }));
+    }
+    const hasErrors = Object.values(errors).some((error) => error !== '');
+    setIsSaveDisabled(hasErrors);
   };
 
   function getExtension(filename) {
@@ -234,6 +277,7 @@ const API_URL = "http://localhost:8080/";
       }
     }
       handleUpdate(1);
+      handleClose();
     });
   };
 
@@ -271,7 +315,11 @@ const getUsers = (id) => {
                                     <Input onChange={handleChange}
                                     name="title" type="text"
                                     label="Название" placeholder="Название"
-                                    inputStyle="box" labelStyle="floating" />
+                                    inputStyle="box" labelStyle="floating" 
+                                    error={`${errors.title ? 'true' : ''}`}
+                                    />
+                                     {errors.title && <div style={{ color: 'red', fontSize: '12px' }}>{errors.title}</div>}
+
                                 </div>
                             </div>
                             <div className="mbsc-row">
@@ -285,6 +333,8 @@ const getUsers = (id) => {
                             inputStyle="box"
                             touchUi={true}
                             value={range}
+                            min = {new Date()}
+                            max = {datetime}
                             onChange={pickerChange}
                             />
                             </div>
@@ -300,14 +350,19 @@ const getUsers = (id) => {
                                     inputStyle="box"
                                     onChange={selectedChange}
                                     filter = {true}
-                                />
+                                    error={`${errors.selectMentors ? 'true' : ''}`}
+                                    />
+                                    {errors.selectMentors && <div style={{ color: 'red', fontSize: '12px' }}>{errors.selectMentors}</div>}
+    
                                 </div>
                                 <div className="mbsc-col-md-12 mbsc-col-10">
                                 <Textarea name="description" inputStyle="box" 
                                  labelStyle="stacked" startIcon="pencil"
-                                 placeholder="Textarea with left icon" label="Description"
+                                 placeholder="Введите описание" label="Описание"
                                  onChange={handleChange}
+                                 error={`${errors.description ? 'true' : ''}`}
                                  ></Textarea>
+                                  {errors.description && <div style={{ color: 'red', fontSize: '12px' }}>{errors.description}</div>}
                                 </div>
 
                                 <div className="mbsc-col-md-6 mbsc-col-6"><input type="checkbox"
@@ -325,14 +380,18 @@ const getUsers = (id) => {
                                 /> <spa>Добавить видео</spa>
                                 { checkedVideo && (
                                <div className="mbsc-col-md-12 mbsc-col-10">
-                               <Input onChange={selectVideoFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Select video files..." label="Video upload"></Input>
+                               <Input 
+                               required
+                               accept=".mp4"
+                               onChange={selectVideoFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Select video files..." label="Video upload"></Input>
                                </div>
                           )} </div> 
                             </div>
                             <Button 
-                              type="submit">Save</Button>
+                               disabled={isSaveDisabled || lesson.title==="" || lesson.description ==="" || 
+                              lesson.dateStart===null || lesson.dateEnd === "" || lesson.userIds.length ===0 || !files.selectVideoFile}
+                              type="submit">Сохранить</Button>
                         </div>  
-
                     </div>
                     </Form>
                 </div>
@@ -457,11 +516,16 @@ const handleUpdate = (obj) => {
       nav("/lesson",{
         state: {
           itemId: id,
-          courseId: data.id
+          courseId: data.id,
+          datetime: data.dateEnd
         }
         });
     };
 
+    const closeCourse = () => {
+      setshowModalCourse(false);
+      handleUpdate(2);
+    }
 
   return (
     <>
@@ -482,7 +546,7 @@ const handleUpdate = (obj) => {
             </div>
           </div>
 
-          <LessonForm handleUpdate={handleUpdate}/>
+          <LessonForm datetime = {data.dateEnd}  handleUpdate={handleUpdate} handleClose ={handleClose}/>
         </div>
       </Modal>
 
@@ -502,7 +566,7 @@ const handleUpdate = (obj) => {
             </div>
           </div>
 
-          <CourseForm handleUpdate={handleUpdate} handleClose={()=>setshowModalCourse(false)} courseId ={location.state.itemId}/>
+          <CourseForm handleUpdate={handleUpdate} handleClose={()=>closeCourse} courseId ={location.state.itemId}/>
         </div>
       </Modal>
         <MDBContainer className="py-5">
@@ -511,7 +575,7 @@ const handleUpdate = (obj) => {
               <MDBCard className="mb-4">
                 <MDBCardBody className="text-center">
                   <MDBCardImage
-                    src={location.state.img}
+                    src={data?.resource?.url}
                     alt="avatar"
                     style={{ width: '500px' }}
                     fluid />
@@ -544,7 +608,7 @@ const handleUpdate = (obj) => {
                     </TabList>
 
                     <TabPanel>
-                        <MDBListGroup flush className="rounded-3 scroll">
+                        <MDBListGroup flush className="rounded-3 scrollLesson">
                         {lessArray['DURING']?.map((items,index) => {
                             return (
                           <MDBListGroupItem className="d-flex  align-items-center p-3 first_block">
@@ -557,7 +621,7 @@ const handleUpdate = (obj) => {
                       </MDBListGroup>
                     </TabPanel>
                     <TabPanel>
-                    <MDBListGroup flush className="rounded-3 scroll">
+                    <MDBListGroup flush className="rounded-3 scrollLesson">
                         {lessArray['FINISHED']?.map((items,index) => {
                             return (
                           <MDBListGroupItem className="d-flex  align-items-center p-3 first_block">
@@ -570,7 +634,7 @@ const handleUpdate = (obj) => {
                       </MDBListGroup>
                     </TabPanel>
                     <TabPanel>
-                    <MDBListGroup flush className="rounded-3 scroll">
+                    <MDBListGroup flush className="rounded-3 scrollLesson">
                         {lessArray['NOT_STARTED']?.map((items,index) => {
                             return (
                           <MDBListGroupItem className="d-flex  align-items-center p-3 first_block">
@@ -616,7 +680,7 @@ const handleUpdate = (obj) => {
                       <MDBCardText>Набор</MDBCardText>
                     </MDBCol>
                     <MDBCol sm="3">
-                      <MDBCardText className="text-muted">{data?.busy}</MDBCardText>
+                      <MDBCardText className="text-muted">{data.busy}</MDBCardText>
                       <MDBCardText className="text-muted">{data.size}</MDBCardText>
                     </MDBCol>
                   </MDBRow>

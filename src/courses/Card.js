@@ -28,7 +28,27 @@ function Cards() {
     const currentUser = AuthService.getCurrentUser()
     const showAdminBoard = currentUser ? currentUser.roles.includes("ROLE_ADMIN") : false
 
-
+    const [errors, setErrors] = useState({}); // Состояние для хранения ошибок
+    const [isSaveDisabled, setIsSaveDisabled] = useState(false);
+  
+    const errorMessages = {
+      title: 'Имя пользователя должно быть больше 2 и меньше 30 символов',
+      description: 'Описание должно быть больше 10 и меньше 100 символов',
+      size: 'Количество мест является обязаельным полем, должно бьть больше 5 и не должно превышать 100',
+      dateRange: 'Количество мест является обязаельным полем, должно бьть больше 5 и не должно превышать 100',
+      selectMentors: 'Поле не должно быть пустым'
+      // Остальные сообщения об ошибках
+    };
+    const currentDate = new Date(); // Текущая дата
+  
+    const validationRules = {
+      title: (value) => value.trim().length < 2 || value.trim().length > 30,
+      description: (value) => value.trim().length < 10 || value.trim().length > 100,
+      size: (value) =>  value > 100 || value < 5,
+      selectMentors:  (value) =>  value.length < 1 ||  value.length > 5
+      // Остальные правила валидации
+    };
+  
     const [pagination, setPagination] = useState({
       currentPage: 1,
       totalPages: 0,
@@ -109,7 +129,6 @@ const handleUpdate = (obj) => {
         inputStyle="box"
         defaultValue='ALL'
         onChange={(item) => setFilter(item.value)}
-        filter = {true}
       />
     </div>
     <section style={{ backgroundColor: '#eee' }}>
@@ -121,7 +140,7 @@ const handleUpdate = (obj) => {
       >
         <div>
           <div className="modal-header modal-header">
-            <div className="modal-title modal-title">Modal Heading</div>
+            <div className="modal-title modal-title">Форма</div>
             <div>
               <span className="close-button course" onClick={handleClose}>
                 x
@@ -198,7 +217,28 @@ function CourseForm({handleUpdate}){
   };
 
   const [users, setUsers] = useState([]);
-  
+  const [errors, setErrors] = useState({}); // Состояние для хранения ошибок
+  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
+
+  const errorMessages = {
+    title: 'Имя пользователя должно быть больше 2 и меньше 30 символов',
+    description: 'Описание должно быть больше 10 и меньше 100 символов',
+    size: 'Количество мест является обязаельным полем, должно бьть больше 5 и не должно превышать 100',
+    dateRange: 'Количество мест является обязаельным полем, должно бьть больше 5 и не должно превышать 100',
+    selectMentors: 'Поле не должно быть пустым',
+    files: 'Фото курса является обязательным'
+    // Остальные сообщения об ошибках
+  };
+  const currentDate = new Date(); // Текущая дата
+
+  const validationRules = {
+    title: (value) => value.trim().length <= 2 || value.trim().length > 30,
+    description: (value) => value.trim().length <= 10 || value.trim().length > 100,
+    size: (value) =>  value > 100 || value <= 5,
+    selectMentors:  (value) =>  value.length < 1 ||  value.length > 5,
+    files: (value) =>  value.length < 1 ||  value.length > 1,
+    // Остальные правила валидации
+  };
   useEffect(() => {
     remoteFiltering('');
   }, []);
@@ -222,6 +262,19 @@ const handleChange = (e) => {
     ...course,
     [e.target.name]: value
   });
+  if (validationRules[e.target.name](value)) {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [e.target.name]: errorMessages[e.target.name],
+    }));
+  } else {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [e.target.name]: '', // Сброс ошибки, если данные валидны
+    }));
+  }
+  const hasErrors = Object.values(errors).some((error) => error !== '');
+  setIsSaveDisabled(hasErrors);
 };
 
 const [range, setRange] = React.useState(null);
@@ -245,11 +298,24 @@ const pickerChange = (ev) => {
   })
 }
 
-const selectedChange = (ev) => {
+const selectedChange = (e) => {
   setCourse({
     ...course,
-    ids: ev.value
+    ids: e.value
   })
+  if (validationRules.selectMentors(e.value)) {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      ["selectMentors"]: errorMessages.selectMentors,
+    }));
+  } else {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      ["selectMentors"]: '', // Сброс ошибки, если данные валидны
+    }));
+  }
+  const hasErrors = Object.values(errors).some((error) => error !== '');
+  setIsSaveDisabled(hasErrors);
 };
 
    const postCourse = (e) => {
@@ -260,12 +326,23 @@ const selectedChange = (ev) => {
     ).then(response => uploadPicture(response.data).then(resp=>handleUpdate(1)));
     };
 
-    const selectFile = (ev) => {
+    const selectFile = (e) => {
       setFiles({
         ...files,
-        selectedFiles: ev.target.files,
+        selectedFiles: e.target.files,
       });
+      if (validationRules.selectMentors(e.value)) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          ["files"]: errorMessages.files,
+        }));
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          ["files"]: '', // Сброс ошибки, если данные валидны
+        }));
     }
+  }
 
     const [files, setFiles] = useState({
       selectedFiles: undefined,
@@ -327,15 +404,19 @@ const selectedChange = (ev) => {
                       >
                     <div className="mbsc-row mbsc-justify-content-center">
                         <div className="mbsc-col-md-10 mbsc-col-xl-8 mbsc-form-grid">
-                            <div className="mbsc-form-group-title">New lesson form</div>
+                            <div className="mbsc-form-group-title">Форма создания курса</div>
                             <div className="mbsc-row">
                               <input hidden type="text "></input>
                                 <div className="mbsc-col-md-12 mbsc-col-12">
                                     <Input
                                      onChange={handleChange}
                                     name="title" type="text"
+                                    error={`${errors.title ? 'true' : ''}`}
+
                                     label="Название" placeholder="Название"
                                     inputStyle="box" labelStyle="floating" />
+                                                                          {errors.title && <div style={{ color: 'red', fontSize: '12px' }}>{errors.title}</div>}
+
                                 </div>
                             </div>
                             <div className="mbsc-row">
@@ -349,8 +430,11 @@ const selectedChange = (ev) => {
                             inputStyle="box"
                             touchUi={true}
                             value={range}
+                            min = {new Date()}
                             onChange={pickerChange}
+                            error={`${errors.dateRange ? 'true' : ''}`}
                             />
+                            {errors.dateRange && <div style={{ color: 'red', fontSize: '12px' }}>{errors.dateRange}</div>}
                             </div>
                             </div>  
 
@@ -365,26 +449,42 @@ const selectedChange = (ev) => {
                                     onChange={selectedChange}
                                     filter = {true}
                                     onFilter={userFilter}
+                                    error={`${errors.selectMentors ? 'true' : ''}`}
+                                    required 
                                 />  
+                                  {errors.selectMentors && <div style={{ color: 'red', fontSize: '12px' }}>{errors.selectMentors}</div>}
+
                                 </div>
                                 <div className="mbsc-col-md-12 mbsc-col-10">
                                 <Textarea name="description" inputStyle="box" 
                                  labelStyle="stacked" startIcon="pencil"
-                                 placeholder="Textarea with left icon" label="Description"
+                                 placeholder="Введите описание курса" label="Описание"
                                  onChange={handleChange}
+                                 error={`${errors.description ? 'true' : ''}`}
                                  ></Textarea>
+                                {errors.description && <div style={{ color: 'red', fontSize: '12px' }}>{errors.description}</div>}
+
                                 </div>
                               
                                 <div className="mbsc-col-md-12 mbsc-col-10">
-                                <Input name="size" min="1" max = "100" onChange={handleChange} multiple inputStyle="box" labelStyle="stacked" type="number" placeholder="Input size..." label="Size"></Input>
+                                <Input 
+                                error={`${errors.size ? 'true' : ''}`}
+                                name="size" min="1" max = "100" onChange={handleChange} multiple inputStyle="box" labelStyle="stacked" type="number" placeholder="Введите количество мест..." label="Места"></Input>
+                                {errors.size && <div style={{ color: 'red', fontSize: '12px' }}>{errors.size}</div>}
                                 </div>
 
                                 <div className="mbsc-col-md-12 mbsc-col-10">
-                                <Input onChange={selectFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Select photo..." label="File upload"></Input>
+                                <Input
+                                accept=".jpg,.jpeg,.png"
+                                hasError={`${errors.files ? 'true' : ''}`}
+                                onChange={selectFile} inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Выберите фото..." label="Загрузка фото" required ></Input>
+                                {errors.files && <div style={{ color: 'red', fontSize: '12px' }}>{errors.files}</div>}
                                 </div>
                             </div>
                             <Button 
-                              type="submit">Save</Button>
+                               disabled={isSaveDisabled || course.title === "" || course.description ==="" || course.dateStart ===null
+                               || course.dateEnd ===null || course.ids.length === 0 || !files.selectedFiles}
+                              type="submit">Сохранить</Button>
                         </div>  
 
                     </div>

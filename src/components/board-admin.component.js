@@ -27,6 +27,7 @@ import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import { Stack } from "@mui/material";
+import { Link } from "react-router-dom";
 
 let PageSize = 4;
 export default function BoardAdmin() {
@@ -174,10 +175,18 @@ const handleChange = (e) => {
 
     );
   }
-  
 function Row({rowData, handleUpdate}) {
   const [open, setOpen] = React.useState(false);
+  const nav = useNavigate();
 
+  const redirectCourse = (id,pictureUrl) => {
+    nav("/course-info",{
+      state: {
+        itemId: id,
+        img :pictureUrl ? pictureUrl :'https://ultimateqa.com/wp-content/uploads/2020/12/Java-logo-icon-1.png'
+      }
+      });
+  };
   return (
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} id={rowData.id}>
@@ -192,8 +201,15 @@ function Row({rowData, handleUpdate}) {
         </TableCell>
         <TableCell>{rowData.id}</TableCell>
         <TableCell>{Helper.dateByFormat(rowData.dateCreation)}</TableCell>
-        <TableCell><a href="#">{rowData.course.title}</a></TableCell>
-        <TableCell><a href="#">{rowData.user.firstname + " "+ rowData.user.lastname}</a></TableCell>
+        <TableCell>
+          {/* <a href="#">{rowData.course.title}</a> */}
+        <><a href="" onClick={() => redirectCourse(rowData.course.id)}>{rowData.course.title}</a><br /></>
+
+        </TableCell>
+        <TableCell>
+          {/* <a href="#">{rowData.user.firstname + " "+ rowData.user.lastname}</a> */}
+         <><Link to="/user" state={{ id: rowData.user.uuid }}>{rowData.user.firstname} {rowData.user.lastname}</Link><br /></>
+        </TableCell>
         <TableCell>{Helper.statusByFormat(rowData.status)}</TableCell>
         <TableCell><div><MenuListComposition id={rowData.id} handleUpdate ={handleUpdate}/></div></TableCell>
       </TableRow>

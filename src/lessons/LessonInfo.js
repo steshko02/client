@@ -15,6 +15,7 @@ import Helper from "../services/Helper"
 import AnswerForm from "./AnswerModalForm"
 import LessonForm from "../components/LessonForm";
 import WorkForm from "../components/WorkForm";
+import { Link } from "react-router-dom";
 
 const API_URL = "http://localhost:8080/";
 
@@ -23,7 +24,7 @@ const showAdminBoard = currentUser ? currentUser.roles.includes("ROLE_ADMIN") : 
 const showUserBoard = currentUser ? currentUser.roles.includes("ROLE_USER") : false
 const showMentorBoard = currentUser ? currentUser.roles.includes("ROLE_LECTURER") : false
 const showStudentBoard = currentUser ? currentUser.roles.includes("ROLE_STUDENT") : false
-function LessonInfo() {
+function LessonInfo( {datetime}) {
 
     const token = AuthService.getCurrentJwt()
 
@@ -32,6 +33,7 @@ function LessonInfo() {
  
     const [showModal, setShowModal] = useState(false);
     const [showAnswerModal, setShowAnswerModal] = useState(false);
+    const [showChangeAnswerModal, setShowChangeAnswerModal] = useState(false);
     const [isAdminOrMentor, setIsAdminOrMentor] = useState(false);
     const [showWorkModal, setshowWorkModal] = useState(false);
     const [showLessonModal, setshowLessonModal] = useState(false);
@@ -80,6 +82,11 @@ const deleteWork = (id) => {
 
 }
 
+var handleChangeAnswerClose = () => {
+  handleUpdate(1);
+  setShowChangeAnswerModal(false);
+}
+
 setOptions({
   theme: 'ios',
   themeVariant: 'light'
@@ -112,7 +119,7 @@ const handleUpdate = (obj) => {
             </div>
           </div>
 
-          <WorkFormLocal handleUpdate={handleUpdate}/>
+          <WorkFormLocal handleUpdate={handleUpdate} datetime={location.state.datetime}/>
 
           <div className="modal-footer course">
             <button className="secondary-button course" onClick={handleClose}>
@@ -166,7 +173,7 @@ const handleUpdate = (obj) => {
         <WorkForm 
         courseId= {data.courseId}
         handleUpdate={handleUpdate}
-         handleClose ={closeWork} lessId ={data.id} />
+         handleClose ={closeWork} lessId ={data.id} datetime={location.state.datetime}/>
       </div>
   
     </Modal>
@@ -188,10 +195,36 @@ const handleUpdate = (obj) => {
         </div>
         <LessonForm 
          courseId= {data.courseId}
-          handleClose ={handleCloseLesson} handleUpdate={handleUpdate} lessonId ={data.id} />
+          handleClose ={handleCloseLesson} handleUpdate={handleUpdate} lessonId ={data.id} datetime={location.state.datetime}/>
       </div>
   
     </Modal>
+
+    <Modal
+                            className="modal"
+                            show={showChangeAnswerModal}
+                            onHide={handleChangeAnswerClose}
+                            renderBackdrop={renderBackdrop}
+                          >
+                            <div>
+                              <div className="modal-header modal-header">
+                                <div className="modal-title modal-title">Modal Heading</div>
+                                <div>
+                                  <span className="close-button course" onClick={handleChangeAnswerClose}>
+                                    x
+                                  </span>
+                                </div>
+                              </div>
+
+                              <AnswerForm handleAnswerClose={handleChangeAnswerClose} handleUpdate={handleUpdate}  work={data.work}  data={data.answer} update={true}/>
+
+                              <div className="modal-footer course">
+                                <button className="secondary-button course" onClick={handleChangeAnswerClose}>
+                                  Close
+                                </button>
+                              </div>
+                            </div>
+                          </Modal>
 
         <MDBContainer className="py-5">
           <MDBRow  className="mb-4">
@@ -202,7 +235,7 @@ const handleUpdate = (obj) => {
               </MDBCard>
 
               <MDBCard className="mb-4 mb-lg-0">
-              { !data.work && (
+              { !data.work && data.studentId === null && (data.mentorId !==null || showAdminBoard)  && (
               <button onClick={() => setShowModal(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
                     Добавить задание
                   </button>
@@ -350,7 +383,8 @@ const handleUpdate = (obj) => {
                     </MDBCol>
                     <MDBCol sm="8">
                       <MDBCardText className="text-muted">{data.mentors?.map((items) => {
-                                   return <><a href="#" id={items.id}>{items.firstname} {items.lastname}</a><br /></>;
+                                  //  return <><a href="#" id={items.id}>{items.firstname} {items.lastname}</a><br /></>;
+                                   return  <><Link to="/user" state={{ id: items.uuid }}>{items.firstname} {items.lastname}</Link><br /></>
                               })}
                          </MDBCardText>
                     </MDBCol>
@@ -398,6 +432,21 @@ const handleUpdate = (obj) => {
                 </MDBCol>
               </MDBRow>
 }
+{ data.studentId !==null && data.mentorId ===null && !showAdminBoard &&
+
+<MDBRow>
+      <MDBCol md="6">
+        <MDBCard className="mb-4 mb-md-4">
+          <MDBCardBody>
+            <MDBCardText className="mb-4"><span className="text-primary font-italic me-1">Функции студента</span>  </MDBCardText>
+            <><button onClick={() => setShowChangeAnswerModal(true)} type="button" class="btn btn-link" data-mdb-ripple-color="dark">
+            Изменить выполненную работу
+          </button><br /></>
+          </MDBCardBody>
+        </MDBCard>
+      </MDBCol>
+    </MDBRow>
+}
 { showAdminBoard &&
 <MDBRow>
       <MDBCol md="6">
@@ -424,7 +473,7 @@ const handleUpdate = (obj) => {
 
 export default LessonInfo;
 
-function WorkFormLocal({handleUpdate}){
+function WorkFormLocal({handleUpdate, datetime}){
 
   const location = useLocation();
   const token = AuthService.getCurrentJwt()
@@ -432,15 +481,32 @@ function WorkFormLocal({handleUpdate}){
       headers: { 'Authorization' : `Bearer ${token}`,  'Access-Control-Allow-Origin': "*"}
   };
   const [deadline, setDeadline] = React.useState(null);
-  
+  const [errors, setErrors] = useState({}); // Состояние для хранения ошибок
+  const [isSaveDisabled, setIsSaveDisabled] = useState(false);
+
+  const errorMessages = {
+    title: 'Имя пользователя должно быть больше 2 и меньше 30 символов',
+    description: 'Описание должно быть больше 10 и меньше 250 символов',
+    dateRange: 'Количество мест является обязаельным полем, должно бьть больше 5 и не должно превышать 100',
+    // Остальные сообщения об ошибках
+  };
+  const currentDate = new Date(); // Текущая дата
+
+  const validationRules = {
+    title: (value) => value.trim().length <= 2 || value.trim().length > 30,
+    description: (value) => value.trim().length <= 10 || value.trim().length > 250,
+    dateRange: (value) => value === null
+
+    // Остальные правила валидации
+  };
+
   const [work, setWork] = useState({
       workId: 0,
       lessonId: location.state.itemId,
       title: "",
       description: "",
-      deadline: null
+      deadline: new Date()
   });
-
 
   const [files, setFiles] = useState({
       selectedFiles: undefined,
@@ -497,11 +563,11 @@ function WorkFormLocal({handleUpdate}){
     });
   }
 
-  const pickerChange = (ev) => {
-    setDeadline(ev.value);
+  const pickerChange = (e) => {
+    setDeadline(e.value);
     setWork({
       ...work,
-      deadline: ev.value
+      deadline: e.value
     })
 }
   const handleChange = (e) => {
@@ -510,6 +576,19 @@ function WorkFormLocal({handleUpdate}){
       ...work,
       [e.target.name]: value
     });
+    if (validationRules[e.target.name](value)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [e.target.name]: errorMessages[e.target.name],
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [e.target.name]: '', // Сброс ошибки, если данные валидны
+      }));
+    }
+    const hasErrors = Object.values(errors).some((error) => error !== '');
+    setIsSaveDisabled(hasErrors); 
   };
 
   const postWork = (e) => {
@@ -538,14 +617,17 @@ function WorkFormLocal({handleUpdate}){
                       >
                     <div className="mbsc-row mbsc-justify-content-center scroll">
                         <div className="mbsc-col-md-1 mbsc-col-xl-8 mbsc-form-grid">
-                            <div className="mbsc-form-group-title">New lesson form</div>
+                            <div className="mbsc-form-group-title">Форма задания</div>
                             <div className="mbsc-row">
                               <input hidden type="text "></input>
                                 <div className="mbsc-col-md-12 mbsc-col-12">
                                     <Input onChange={handleChange}
                                     name="title" type="text"
+                                    error={`${errors.title ? 'true' : ''}`}
                                     label="Название" placeholder="Название"
                                     inputStyle="box" labelStyle="floating" />
+                                            {errors.title && <div style={{ color: 'red', fontSize: '12px' }}>{errors.title}</div>}
+
                                 </div>
                             </div>
                             <div className="mbsc-row">
@@ -559,7 +641,14 @@ function WorkFormLocal({handleUpdate}){
                                 controls={['calendar', 'time']}
                                 touchUi={true}
                                 onChange={pickerChange}
+                                min={new Date()}
+                                max={datetime}
+                                value = {work.deadline}
+                                error={`${errors.dateRange ? 'true' : ''}`}
+                                required
                             />
+                              {errors.dateRange && <div style={{ color: 'red', fontSize: '12px' }}>{errors.dateRange}</div>}
+
                             </div>
                           
                             </div>  
@@ -568,18 +657,21 @@ function WorkFormLocal({handleUpdate}){
                                 <div className="mbsc-col-md-12 mbsc-col-10">
                                 <Textarea name="description" inputStyle="box" 
                                  labelStyle="stacked" startIcon="pencil"
-                                 placeholder="Textarea with left icon" label="Description"
+                                 placeholder="Поле ввода" label="Описание"
                                  onChange={handleChange}
+                                 error={`${errors.description ? 'true' : ''}`}
                                  ></Textarea>
-                                </div>
+                                {errors.description && <div style={{ color: 'red', fontSize: '12px' }}>{errors.description}</div>}
+                              </div>
 
                                 <div className="mbsc-col-md-12 mbsc-col-12">
-                                <Input onChange={selectFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Select text files..." label="Files upload"></Input>
+                                <Input onChange={selectFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Прикрепите файлы..." label="Загрузка файлов"></Input>
                                 </div>
 
                             </div>
                             <Button 
-                              type="submit">Save</Button>
+                              disabled={isSaveDisabled || work.title ==="" || work.description ==="" || work.deadline === null}
+                              type="submit">Сохранить</Button>
                         </div>  
 
                     </div>

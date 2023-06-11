@@ -8,7 +8,7 @@ import Form from "react-validation/build/form";
 import UploadService from "../services/UploadService";
 
 const API_URL = "http://localhost:8080/";
- export default function WorkForm({handleUpdate, handleClose, lessId, courseId}){
+ export default function WorkForm({handleUpdate, handleClose, lessId, courseId, datetime}){
 
     const token = AuthService.getCurrentJwt()
     const config = {
@@ -28,7 +28,23 @@ const API_URL = "http://localhost:8080/";
     const [res, setRes] = React.useState([]);
     const [newRes, setNewRes] = React.useState([]);
     const [workUpdate, setWorkUpdate] = React.useState(0);
-
+    const [errors, setErrors] = useState({}); // Состояние для хранения ошибок
+    const [isSaveDisabled, setIsSaveDisabled] = useState(false);
+  
+    const errorMessages = {
+      title: 'Имя пользователя должно быть больше 2 и меньше 30 символов',
+      description: 'Описание должно быть больше 10 и меньше 100 символов',
+      dateRange: 'Количество мест является обязаельным полем, должно бьть больше 5 и не должно превышать 100',
+      // Остальные сообщения об ошибках
+    };
+    const currentDate = new Date(); // Текущая дата
+  
+    const validationRules = {
+      title: (value) => value.trim().length <= 2 || value.trim().length > 30,
+      description: (value) => value.trim().length <= 10 || value.trim().length > 100,
+      // Остальные правила валидации
+    };
+  
     const changeRes = (ev, newData) => {
       const isChecked = ev.target.checked; // Получаем текущее значение чекбокса
     
@@ -146,6 +162,19 @@ const API_URL = "http://localhost:8080/";
         ...work,
         [e.target.name]: value
       });
+      if (validationRules[e.target.name](value)) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [e.target.name]: errorMessages[e.target.name],
+        }));
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [e.target.name]: '', // Сброс ошибки, если данные валидны
+        }));
+      }
+      const hasErrors = Object.values(errors).some((error) => error !== '');
+      setIsSaveDisabled(hasErrors);
     };
 
     const postWork = (e) => {
@@ -167,7 +196,7 @@ const API_URL = "http://localhost:8080/";
       );
       
     };
-  
+    console.log(datetime)
     return(
         <Page>
               <div className="mbsc-grid mbsc-grid-fixed">
@@ -183,9 +212,11 @@ const API_URL = "http://localhost:8080/";
                                   <div className="mbsc-col-md-12 mbsc-col-12">
                                       <Input onChange={handleChange}
                                       name="title" type="text"
+                                    error={`${errors.title ? 'true' : ''}`}
                                       label="Название" placeholder="Название"
                                       inputStyle="box" labelStyle="floating" 
                                       value={work.title}/>
+                                      {errors.title && <div style={{ color: 'red', fontSize: '12px' }}>{errors.title}</div>}
                                   </div>
                               </div>
                               <div className="mbsc-row">
@@ -200,9 +231,12 @@ const API_URL = "http://localhost:8080/";
                                   touchUi={true}
                                   onChange={pickerChange}
                                   value={work.deadline}
+                                  min={new Date()}
+                                  max={datetime}
+                                  error={`${errors.dateRange ? 'true' : ''}`}
                               />
+                               {errors.dateRange && <div style={{ color: 'red', fontSize: '12px' }}>{errors.dateRange}</div>}
                               </div>
-                            
                               </div>  
   
                               <div className="mbsc-row">
@@ -212,18 +246,20 @@ const API_URL = "http://localhost:8080/";
                                    placeholder="Textarea with left icon" label="Description"
                                    onChange={handleChange}
                                    value={work.description}
+                                   error={`${errors.description ? 'true' : ''}`}
                                    ></Textarea>
+                                  {errors.description && <div style={{ color: 'red', fontSize: '12px' }}>{errors.description}</div>}
                                   </div>
-                                 
                                   <div className="mbsc-col-md-12 mbsc-col-12">
                                   <Input  onChange={selectFile} multiple inputStyle="box" labelStyle="stacked" type="file" startIcon="folder" placeholder="Select text files..." label="Files upload"></Input>
                                   </div>
                                   <div>
                                 {res &&
-                                  <><span>Ресурсы: </span><div>
+                                  <><span className = "ml-3">Ресурсы: </span><div>
                                     {res?.map((items) => {
                                       return (<>
                                       <input 
+                                       className = "ml-3"
                                        onChange={(ev) => changeRes(ev,items)} type="checkbox"
                                        checked={newRes.includes(items)}
                                        ></input>
@@ -235,9 +271,9 @@ const API_URL = "http://localhost:8080/";
                                   </div>
                               </div>
                               <Button 
+                               disabled={isSaveDisabled || work.title ==="" || work.description ==="" || work.deadline === null}
                                 type="submit">Сохранить</Button>
                           </div>  
-  
                       </div>
                       </Form>
                   </div>
