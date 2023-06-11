@@ -38,11 +38,11 @@ const Home = () => {
 
   return (
     <><div className="slider-container">
-      <h1 className="greeting">Привет, {userName}!</h1> 
+      {/* <h1 className="greeting">Привет, {userName}!</h1>  */}
       {images.map((image, index) => (
         <div className={'slider-item ' + (index % 2 === 0 ? 'left' : 'right')} key={index}>
           <div className={'image-description ' + (index % 2 === 0 ? 'right' : 'left')}>
-            <p className={'p' + (index + 1)}>{image.description}</p>
+            <p className={'p' + (index + 1)}>{image.description}</p>  
           </div>
           <div className={"image-wrapper-" + (index % 2 === 0 ? 'left' : 'right')}>
             <img src={image.src} alt={'Изображение ' + (index + 1)} />

@@ -13,6 +13,8 @@ export default class Profile extends Component {
     };
   }
 
+
+  
   componentDidMount() {
     const currentUser = AuthService.getCurrentUser();
 
