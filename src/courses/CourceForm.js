@@ -72,7 +72,7 @@ export default function CourseForm({handleUpdate, handleClose, courseId}){
     dateStart: data.dateStart,
     dateEnd: data.dateEnd,
     ids: data.mentors?.map((item) => {return item.uuid }),
-    imgUrl: 'https://bootdey.com/img/Content/avatar/avatar7.png',
+    imgUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjr__O2vAvx27W_uzYxtssdgDugdZNnAKxeA&usqp=CAU',
     size: data.size
   });
 
@@ -326,7 +326,7 @@ const handleChange = (e) => {
                                   </div>
                                 
                                   <div className="mbsc-col-md-12 mbsc-col-10">
-                                  <input onChange={selectFile} type='file' id='file' ref={inputFile} style={{display: 'none'}}/>
+                                  <input accept=".jpg,.jpeg,.png" onChange={selectFile} type='file' id='file' ref={inputFile} style={{display: 'none'}}/>
                                   </div>
                               </div>
                               <Button 

@@ -92,7 +92,6 @@ SideMenu.defaultProps = {
       <MenuLink href="/learn-process">Учебный процесс</MenuLink>
       </>
      )} 
-            {/* <MenuLink href="/">Главная</MenuLink> */}
            <MenuLink href="/courses">Курсы</MenuLink>
            <MenuLink href="/profile">Профиль</MenuLink>
 

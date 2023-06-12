@@ -7,17 +7,11 @@ import AuthService from "../services/auth.service";
 import React, { useEffect, useState,useMemo } from 'react';
 import { useNavigate } from "react-router-dom";
 import Pagination from "../services/Pagination";
-import {
-  MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardText, MDBCardBody, MDBCardImage, MDBBtn, MDBBreadcrumb, MDBBreadcrumbItem, MDBProgress, MDBProgressBar, MDBIcon,MDBListGroup,MDBListGroupItem, MDBCardLink
-} from 'mdb-react-ui-kit';
 import "./modal.css";
 import { Button, Dropdown, Input, Page, setOptions,Textarea,Datepicker,Stepper, Select, Checkbox } from '@mobiscroll/react';
 import '@mobiscroll/react/dist/css/mobiscroll.min.css';
 import Form from "react-validation/build/form";
 import Modal from "react-overlays/Modal";
-import UploadService from "../services/UploadService";
-import Helper from "../services/Helper"
-
 const API_URL = "http://localhost:8080/";
 
 
@@ -27,7 +21,9 @@ function Cards() {
     const token = AuthService.getCurrentJwt()
     const currentUser = AuthService.getCurrentUser()
     const showAdminBoard = currentUser ? currentUser.roles.includes("ROLE_ADMIN") : false
-
+    const showUserBoard = currentUser ? currentUser.roles.includes("ROLE_USER") : false
+    const showMentorBoard = currentUser ? currentUser.roles.includes("ROLE_LECTURER") : false
+    const showStudentBoard = currentUser ? currentUser.roles.includes("ROLE_STUDENT") : false
     const [errors, setErrors] = useState({}); // Состояние для хранения ошибок
     const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   
@@ -103,8 +99,41 @@ const handleUpdate = (obj) => {
     { text: 'Неначатые', value: 'NOT_STARTED' },
     { text: 'Законченные', value: 'FINISHED' },
     { text: 'Начатые', value: 'DURING' },
-    { text: 'Удаленные', value: 'DELETED' },
+    // { text: 'Удаленные', value: 'DELETED' },
 ]
+
+const filter_data_user = [
+  { text: 'Доступные', value: 'NOT_STARTED' },
+  { text: 'Мои', value: 'FOR_USER' }
+  // { text: 'Удаленные', value: 'DELETED' },
+]
+
+const filter_data_MENTOR = [
+  { text: 'Менторские', value: 'FOR_MENTOR' },
+  { text: 'Все', value: 'ALL' },
+  { text: 'Неначатые', value: 'NOT_STARTED' },
+  { text: 'Законченные', value: 'FINISHED' },
+  { text: 'Начатые', value: 'DURING' },
+  // { text: 'Удаленные', value: 'DELETED' },
+]
+
+function mergeFilterData() {
+  let mergedData = new Set();
+
+  if (showAdminBoard) {
+     filter_data.forEach(item => mergedData.add(item));
+     return Array.from(mergedData);
+  }  if (showUserBoard || showStudentBoard) {
+    filter_data_user.forEach(item => mergedData.add(item));
+  }  if (showMentorBoard) {
+    filter_data_MENTOR.forEach(item => mergedData.add(item));
+  } 
+
+  return Array.from(mergedData);
+}
+
+const filter_final = mergeFilterData();
+
 
   return (
     
@@ -114,7 +143,7 @@ const handleUpdate = (obj) => {
 
       {post.map((items) => {
         return <Card
-          img={items.resource ? items.resource.url : 'https://ultimateqa.com/wp-content/uploads/2020/12/Java-logo-icon-1.png'}
+          img={items.resource ? items.resource.url : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjr__O2vAvx27W_uzYxtssdgDugdZNnAKxeA&usqp=CAU'}
           title={items.title}
           description={items.description}
           id={items.id} />;
@@ -123,7 +152,7 @@ const handleUpdate = (obj) => {
     <div className="course_filter">
     <Select
         placeholder="Отобразить ..."
-        data={filter_data}
+        data={filter_final}
         selectMultiple={false}
         touchUi={false}
         inputStyle="box"
@@ -185,7 +214,7 @@ function Card(props) {
     nav("/course-info",{
       state: {
         itemId: id,
-        img :pictureUrl ? pictureUrl :'https://ultimateqa.com/wp-content/uploads/2020/12/Java-logo-icon-1.png'
+        img :pictureUrl ? pictureUrl :'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjr__O2vAvx27W_uzYxtssdgDugdZNnAKxeA&usqp=CAU'
       }
       });
   };
@@ -267,14 +296,16 @@ const handleChange = (e) => {
       ...prevErrors,
       [e.target.name]: errorMessages[e.target.name],
     }));
+    setIsSaveDisabled(false);
   } else {
     setErrors((prevErrors) => ({
       ...prevErrors,
       [e.target.name]: '', // Сброс ошибки, если данные валидны
     }));
+    setIsSaveDisabled(true);
   }
-  const hasErrors = Object.values(errors).some((error) => error !== '');
-  setIsSaveDisabled(hasErrors);
+  // const hasErrors = Object.values(errors).some((error) => error !== '');
+  // setIsSaveDisabled(hasErrors);
 };
 
 const [range, setRange] = React.useState(null);
@@ -308,14 +339,16 @@ const selectedChange = (e) => {
       ...prevErrors,
       ["selectMentors"]: errorMessages.selectMentors,
     }));
+    setIsSaveDisabled(false);
   } else {
     setErrors((prevErrors) => ({
       ...prevErrors,
       ["selectMentors"]: '', // Сброс ошибки, если данные валидны
     }));
+    // const hasErrors = Object.values(errors).some((error) => error !== '');
+    // setIsSaveDisabled(hasErrors);
+    setIsSaveDisabled(true);
   }
-  const hasErrors = Object.values(errors).some((error) => error !== '');
-  setIsSaveDisabled(hasErrors);
 };
 
    const postCourse = (e) => {
@@ -331,17 +364,6 @@ const selectedChange = (e) => {
         ...files,
         selectedFiles: e.target.files,
       });
-      if (validationRules.selectMentors(e.value)) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          ["files"]: errorMessages.files,
-        }));
-      } else {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          ["files"]: '', // Сброс ошибки, если данные валидны
-        }));
-    }
   }
 
     const [files, setFiles] = useState({
@@ -482,7 +504,7 @@ const selectedChange = (e) => {
                                 </div>
                             </div>
                             <Button 
-                               disabled={isSaveDisabled || course.title === "" || course.description ==="" || course.dateStart ===null
+                               disabled={isSaveDisabled &&  course.dateStart === null
                                || course.dateEnd ===null || course.ids.length === 0 || !files.selectedFiles}
                               type="submit">Сохранить</Button>
                         </div>  

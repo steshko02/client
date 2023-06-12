@@ -164,14 +164,14 @@ const API_URL = "http://localhost:8080/";
   }, []);
 
   const upload = (id) => {
-    let currentFile = files.selectedFiles[0];
+    let currentFile = files.selectedFiles;
 
     setFiles({
       ...files,
       progress: 0,
       currentFile: currentFile,
     });
-      UploadService.upload(currentFile, API_URL + "lessons/upload/"+location.state.itemId+"/" + id, (event) => {
+      UploadService.uploadFiles(currentFile, API_URL + "lessons/upload-files/"+location.state.itemId+"/" + id, (event) => {
         setFiles({
           ...files,
           progress: Math.round((100 * event.loaded) / event.total),
@@ -614,8 +614,9 @@ const handleUpdate = (obj) => {
                           <MDBListGroupItem className="d-flex  align-items-center p-3 first_block">
                             <MDBIcon fas icon="globe fa-lg text-warning" />
                             <a class="sidenav-link" onClick= {() => {redirectLesson(items.id)}} ><span> Занятие: </span> {items.title} </a>
-                            <Button  className="second_block ml-2" id={items.id}  startIcon="ion-close-circled" onClick={deleteLesson} >Удалить</Button>
-                          </MDBListGroupItem>
+                            {showAdminBoard && data.studentId==null &&
+                            <Button className="second_block  ml-2" id={items.id}  startIcon="ion-close-circled" onClick={deleteLesson} >Удалить</Button>
+                            }                          </MDBListGroupItem>
                             )
                         })}  
                       </MDBListGroup>
@@ -627,10 +628,12 @@ const handleUpdate = (obj) => {
                           <MDBListGroupItem className="d-flex  align-items-center p-3 first_block">
                             <MDBIcon fas icon="globe fa-lg text-warning" />
                             <a class="sidenav-link" onClick= {() => {redirectLesson(items.id)}}><span>Занятие: </span> {items.title}</a>
+                            {showAdminBoard && data.studentId==null &&
                             <Button className="second_block  ml-2" id={items.id}  startIcon="ion-close-circled" onClick={deleteLesson} >Удалить</Button>
-                          </MDBListGroupItem>
+                            }
+                            </MDBListGroupItem>
                             )
-                        })}  
+                        })}
                       </MDBListGroup>
                     </TabPanel>
                     <TabPanel>
@@ -640,8 +643,9 @@ const handleUpdate = (obj) => {
                           <MDBListGroupItem className="d-flex  align-items-center p-3 first_block">
                             <MDBIcon fas icon="globe fa-lg text-warning" />
                             <a class="sidenav-link" onClick= {() => {redirectLesson(items.id)}}><span>Занятие: </span> {items.title}</a>
+                            {showAdminBoard && data.studentId==null &&
                             <Button className="second_block  ml-2" id={items.id}  startIcon="ion-close-circled" onClick={deleteLesson} >Удалить</Button>
-                          </MDBListGroupItem>
+                            }                          </MDBListGroupItem>
                             )
                         })}  
                       </MDBListGroup>

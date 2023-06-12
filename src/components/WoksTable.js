@@ -219,8 +219,8 @@ export default function WorksTable({lessonId}) {
                 </Typography>
                 <p><WithLinks text ={rowData.comment}></WithLinks></p>              
                     {rowData.resource?.map((items) => {
-                      return (<a href={items.url}>
-                        {items.filename}</a>)
+                      return (<><a href={items.url}>
+                        {items.filename}</a><br /></>)
                     })}
                     <br/>
                     <br/>
@@ -231,9 +231,12 @@ export default function WorksTable({lessonId}) {
                     {show &&
                 <Form  onSubmit={postMark}  >
                                 <Input name="mark" 
+                                                                required
+
                                 onChange={handleChange} 
                                 multiple inputStyle="box" labelStyle="stacked" type="number" placeholder="Отметка" label="Отметка"
-                                value={makr.mark}></Input>
+                                value={makr.mark}>
+                                </Input>
                                 {/* </div> */}
 
                   <Textarea name="comment" inputStyle="box" 
@@ -242,7 +245,7 @@ export default function WorksTable({lessonId}) {
                                  value={makr.comment}
                                  onChange={handleChange}
                                  ></Textarea>
-                <Button type="submit">Save</Button>
+                <Button type="submit">Сохранить</Button>
               </Form>
                 }
               </Box>

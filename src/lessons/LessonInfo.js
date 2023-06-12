@@ -317,9 +317,8 @@ const handleUpdate = (obj) => {
                   <>
                     <MDBCol sm="9" >
                     {data.answer.resource?.map((items, index) => {
-                      return (<a href={items.url}>
-                        {/* <img src="http://s1.iconbird.com/ico/2013/2/634/w42h50139292027210.png"/> */}
-                        {items.filename}</a>)
+                      return (<><a href={items.url}>
+                        {items.filename}</a><br/></>)
                     })}
                     </MDBCol>
                     </>
@@ -519,14 +518,14 @@ function WorkFormLocal({handleUpdate, datetime}){
   });
 
   const upload = (id) => {
-    let currentFile = files.selectedFiles[0];
+    let currentFile = files.selectedFiles;
 
     setFiles({
       ...files,
       progress: 0,
       currentFile: currentFile,
     });
-      UploadService.upload(currentFile, API_URL + "works/upload/"+location.state.courseId+"/" + location.state.itemId +"/"+ id, (event) => {
+      UploadService.uploadFiles(currentFile, API_URL + "works/upload-files/"+location.state.courseId+"/" + location.state.itemId +"/"+ id, (event) => {
         setFiles({
           ...files,
           progress: Math.round((100 * event.loaded) / event.total),

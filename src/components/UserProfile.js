@@ -5,7 +5,7 @@ import AuthService from "../services/auth.service";
 import http from "../http-common";
 
 const API_URL = "http://localhost:8080/";
-const maxLength = 100; // Максимальная длина поля ввода
+
 
 export default function UserProfile() {
  
@@ -153,7 +153,6 @@ export default function UserProfile() {
             },
           )
           setUpdate(update+2)
-
     }
     
 
@@ -212,7 +211,6 @@ export default function UserProfile() {
                                       <a href="#" onClick={onButtonClick}>
                                         <div>
                                             <img  className="image" 
-                                            //  src="https://bootdey.com/img/Content/avatar/avatar7.png"
                                             src = {files.selectedFiles ? URL.createObjectURL(files?.selectedFiles[0]) : profile.photoUrl}
                                             alt="Photo" />
                                         </div>
@@ -231,7 +229,7 @@ export default function UserProfile() {
                           </div>
                       </div>
                   </div>
-                  <input onChange={selectFile} type='file' id='file' ref={inputFile} style={{display: 'none'}}/>
+                  <input  accept=".jpg,.jpeg,.png" onChange={selectFile} type='file' id='file' ref={inputFile} style={{display: 'none'}}/>
                   <div className="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
                       <div className="card h-100">
                           <div className="card-body">
@@ -249,7 +247,7 @@ export default function UserProfile() {
                                            onChange={handleChange} 
                                            value={profile.firstname}
                                             type="text" name="firstname"
-                                              id="fullName" placeholder="Enter full name" />
+                                              id="fullName" placeholder="Имя" />
                                       </div>
                                       {errors.firstname && <div style={{ color: 'red', fontSize: '12px' }}>{errors.firstname}</div>}
 
@@ -260,7 +258,7 @@ export default function UserProfile() {
                                           <input
                                           className={`form-control ${errors.lastname ? 'is-invalid' : ''}`}
 
-                                          disabled = {state.disabled} onChange={handleChange} value={profile.lastname} type="text" name="lastname"  id="fullName" placeholder="Enter full name"/>
+                                          disabled = {state.disabled} onChange={handleChange} value={profile.lastname} type="text" name="lastname"  id="fullName" placeholder="Фамилия"/>
                                       </div>
                                       {errors.lastname && <div style={{ color: 'red', fontSize: '12px' }}>{errors.lastname}</div>}
                                   </div>
@@ -270,7 +268,7 @@ export default function UserProfile() {
                                           <input
                                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
 
-                                          disabled = {state.disabled} onChange={handleChange} value={profile.email} type="email" name="email" id="eMail" placeholder="Enter email ID"/>
+                                          disabled = {state.disabled} onChange={handleChange} value={profile.email} type="email" name="email" id="eMail" placeholder="Email"/>
                                       </div>
                                       {errors.email && <div style={{ color: 'red', fontSize: '12px' }}>{errors.email}</div>}
 
@@ -281,7 +279,7 @@ export default function UserProfile() {
                                           <input 
                                         className={`form-control ${errors.phoneNumber ? 'is-invalid' : ''}`}
                                           disabled = {state.disabled} onChange={handleChange} value={profile.phoneNumber} type="text"
-                                           name="phoneNumber"  id="phone" placeholder="Enter phone number" />
+                                           name="phoneNumber"  id="phone" placeholder="Телефон" />
                                              {errors.phoneNumber && <div style={{ color: 'red', fontSize: '12px' }}>{errors.phoneNumber}</div>}
 
                                       </div>    
@@ -298,7 +296,7 @@ export default function UserProfile() {
                                            className={`form-control ${errors.githubUrl ? 'is-invalid' : ''}`}
                                            disabled = {state.disabled} onChange={handleChange}
                                             value={profile.githubUrl} type="url" name="githubUrl"  
-                                             id="website" placeholder="Website url" />
+                                             id="website" placeholder="Github" />
                                               {errors.githubUrl && <div style={{ color: 'red', fontSize: '12px' }}>{errors.githubUrl}</div>}
                                       </div>
                                   </div>
@@ -309,7 +307,7 @@ export default function UserProfile() {
                                            className={`form-control ${errors.jobTitle ? 'is-invalid' : ''}`}
                                           disabled = {state.disabled} 
                                           onChange={handleChange} value={profile.jobTitle}
-                                           type="name" name="jobTitle" id="Street" placeholder="Enter Street" />
+                                           type="name" name="jobTitle" id="Street" placeholder="Должность" />
                                            {errors.jobTitle && <div style={{ color: 'red', fontSize: '12px' }}>{errors.jobTitle}</div>}
 
                                       </div>
@@ -320,7 +318,7 @@ export default function UserProfile() {
                                           <input
                                              className={`form-control ${errors.department ? 'is-invalid' : ''}`}
                                            disabled = {state.disabled} onChange={handleChange} 
-                                           value={profile.department}  type="name" name="department"  id="ciTy" placeholder="Enter City" />
+                                           value={profile.department}  type="name" name="department"  id="ciTy" placeholder="Департамент" />
                                     {errors.department && <div style={{ color: 'red', fontSize: '12px' }}>{errors.department}</div>}
 
                                       </div>
@@ -331,7 +329,7 @@ export default function UserProfile() {
                                           <input 
                                             className={`form-control ${errors.experience ? 'is-invalid' : ''}`}
                                           disabled = {state.disabled} onChange={handleChange} value={profile.experience} type="text" name="experience"
-                                           id="sTate" placeholder="Enter State" />
+                                           id="sTate" placeholder="Опыт (лет)" />
                                           {errors.experience && <div style={{ color: 'red', fontSize: '12px' }}>{errors.experience}</div>}
 
                                       </div>
@@ -346,7 +344,7 @@ export default function UserProfile() {
                                           <textarea
                                           className={`form-control ${errors.other ? 'is-invalid' : ''}`}
                                           disabled = {state.disabled} onChange={handleChange} value={profile.other} type="text" name="other"
-                                           id="fullName" placeholder="Enter full name" />
+                                           id="fullName" placeholder="О себе" />
                                           {errors.other && <div style={{ color: 'red', fontSize: '12px' }}>{errors.other}</div>}
 
                                       </div>
