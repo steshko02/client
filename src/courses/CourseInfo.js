@@ -580,15 +580,24 @@ const handleUpdate = (obj) => {
                     style={{ width: '500px' }}
                     fluid />
                 </MDBCardBody>
-              {!data.studentId && !showAdminBoard && data.mentorId === null &&  data.bookingStatus ===null &&               
+              {!data.studentId && !showAdminBoard && data.mentorId === null &&  data.bookingStatus === null && data.status === 'NOT_STARTED' &&  data.busy<data.size &&           
                 <Button onClick={() => bookCourse()} btnStyle="primary">Записаться на курс</Button>
                 
-                }
+              }
                 {data.bookingStatus === 'CONSIDERED' &&
                   <Button btnStyle="primary" disabled>Ваша заявка на рассмотрении</Button>
                 }
                 {data.bookingStatus === 'CANCELLED' &&
                   <Button btnStyle="primary" disabled>Ваша заявка отклонена</Button>
+                }
+                { data.busy>=data.size && !showAdminBoard && data.mentorId === null &&
+                    <Button btnStyle="primary" disabled>Набор на курс завершен</Button>
+                }
+                { (data.status === 'DURING' || data.dateStart < new Date()) && !showAdminBoard && data.mentorId === null &&
+                    <Button btnStyle="primary" disabled>Курс уже начался</Button>
+                }
+                { data.status === 'FINISHED' && !showAdminBoard && data.mentorId === null && 
+                    <Button btnStyle="primary" disabled>Курс закончен</Button>
                 }
               </MDBCard>
               <MDBCard className="mb-4 mb-lg-0">

@@ -58,7 +58,33 @@ function Cards() {
     const [post, setPost] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [addLesson, setaddLesson] = useState(0);
-    const [filter, setFilter] = useState('ALL');
+    const filter_data = [
+      { text: 'Все', value: 'ALL' },
+      { text: 'Неначатые', value: 'NOT_STARTED' },
+      { text: 'Законченные', value: 'FINISHED' },
+      { text: 'Начатые', value: 'DURING' },
+      // { text: 'Удаленные', value: 'DELETED' },
+  ]
+  
+  const filter_data_user = [
+    { text: 'Доступные', value: 'NOT_STARTED' },
+    { text: 'Мои', value: 'FOR_USER' }
+    // { text: 'Удаленные', value: 'DELETED' },
+  ]
+  
+  const filter_data_MENTOR = [
+    { text: 'Менторские', value: 'FOR_MENTOR' },
+    { text: 'Все', value: 'ALL' },
+    { text: 'Неначатые', value: 'NOT_STARTED' },
+    { text: 'Законченные', value: 'FINISHED' },
+    { text: 'Начатые', value: 'DURING' },
+    // { text: 'Удаленные', value: 'DELETED' },
+  ]
+
+    const filter_final = mergeFilterData();
+
+    const [filter, setFilter] = useState(filter_final[0].value);
+
 
     useEffect(() => {
       axios.get("http://localhost:8080/courses/filter/" + filter,
@@ -94,29 +120,6 @@ const handleUpdate = (obj) => {
   const renderBackdrop = (props) => <div className="backdrop" {...props} />;
   const props1 = { placeholder: 'Please Select...', label: 'Calendar' };
 
-  const filter_data = [
-    { text: 'Все', value: 'ALL' },
-    { text: 'Неначатые', value: 'NOT_STARTED' },
-    { text: 'Законченные', value: 'FINISHED' },
-    { text: 'Начатые', value: 'DURING' },
-    // { text: 'Удаленные', value: 'DELETED' },
-]
-
-const filter_data_user = [
-  { text: 'Доступные', value: 'NOT_STARTED' },
-  { text: 'Мои', value: 'FOR_USER' }
-  // { text: 'Удаленные', value: 'DELETED' },
-]
-
-const filter_data_MENTOR = [
-  { text: 'Менторские', value: 'FOR_MENTOR' },
-  { text: 'Все', value: 'ALL' },
-  { text: 'Неначатые', value: 'NOT_STARTED' },
-  { text: 'Законченные', value: 'FINISHED' },
-  { text: 'Начатые', value: 'DURING' },
-  // { text: 'Удаленные', value: 'DELETED' },
-]
-
 function mergeFilterData() {
   let mergedData = new Set();
 
@@ -132,7 +135,6 @@ function mergeFilterData() {
   return Array.from(mergedData);
 }
 
-const filter_final = mergeFilterData();
 
 
   return (
@@ -156,7 +158,7 @@ const filter_final = mergeFilterData();
         selectMultiple={false}
         touchUi={false}
         inputStyle="box"
-        defaultValue='ALL'
+        defaultValue= {filter}
         onChange={(item) => setFilter(item.value)}
       />
     </div>

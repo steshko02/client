@@ -292,7 +292,7 @@ const API_URL = "http://localhost:8080/";
     >
       <div className='scroll' >
         <div className="modal-header modal-header">
-          <div className="modal-title modal-title">Modal Heading</div>
+          <div className="modal-title modal-title">Работы пользователей</div>
           <div>
             <span className="close-button course" onClick={() => setShowModal(false)}>
               x

@@ -21,6 +21,9 @@ import Form from "react-validation/build/form";
 import "./status.css"
 import { Button, Dropdown, Input, Page, setOptions,Textarea,Datepicker,Stepper, Select, Checkbox } from '@mobiscroll/react';
 import '@mobiscroll/react/dist/css/mobiscroll.min.css';
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 const API_URL = "http://localhost:8080/";
 
 let PageSize = 10;
@@ -140,7 +143,16 @@ export default function WorksTable({lessonId}) {
     const [open, setOpen] = React.useState(false);
 
     const [show, setShow] = React.useState(false);
+    const nav = useNavigate();
 
+    const redirectLesson = (id) => {
+      nav("/lesson",{
+        state: {
+          itemId: id,
+          courseId: rowData.id
+        }
+        });
+    };
 
     const [makr, setMark] = useState({
         id: 0,
@@ -204,7 +216,7 @@ export default function WorksTable({lessonId}) {
               {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
         </TableCell>
-        <TableCell><a href="#">{rowData.user.firstname} {rowData.user.lastname}</a></TableCell>
+        <TableCell><><Link to="/user" state={{ id: rowData.user.uuid }}>{rowData.user.firstname} {rowData.user.lastname}</Link><br /></></TableCell>
           <TableCell><b><span className={rowData.timeStatus}>{Helper.statusByFormatForTask(rowData.timeStatus)}</span></b></TableCell>
           <TableCell>{rowData.workTitle}</TableCell>
           <TableCell>{Helper.dateByFormat(rowData.date)}</TableCell>
